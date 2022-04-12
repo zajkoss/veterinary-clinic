@@ -27,7 +27,7 @@ public class Doctor implements Serializable {
     @Column(nullable = false)
     private BigDecimal salary;
 
-    @Column(nullable = false,length = 10)
+    @Column(nullable = false,length = 10,unique = true)
     private String nip;
 
     @Column(nullable = false)
@@ -89,11 +89,11 @@ public class Doctor implements Serializable {
         this.nip = nip;
     }
 
-    public Boolean getActive() {
+    public Boolean getIsActive() {
         return isActive;
     }
 
-    public void setActive(Boolean active) {
+    public void setIsActive(Boolean active) {
         isActive = active;
     }
 
