@@ -13,6 +13,7 @@ public class NoEmptyIdException extends RuntimeException {
     }
 
     public NoEmptyIdException(Long id) {
+        super("id:" + id);
         this.id = id;
     }
 
