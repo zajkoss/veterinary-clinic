@@ -34,7 +34,7 @@ public class DoctorService implements IDoctorService {
     @Override
     public Doctor get(Long id) {
         return repository
-                .findById(Optional.ofNullable(id).orElseThrow(() -> new EmptyIdException()))
+                .findById(Optional.ofNullable(id).orElseThrow(() -> new EmptyIdException(id)))
                 .orElseThrow(() -> new NoEntityException(id));
     }
 
@@ -46,7 +46,7 @@ public class DoctorService implements IDoctorService {
     @Override
     public void softDelete(Long id) {
         Doctor loadedDoctor = repository
-                .findById(Optional.ofNullable(id).orElseThrow(() -> new EmptyIdException()))
+                .findById(Optional.ofNullable(id).orElseThrow(() -> new EmptyIdException(id)))
                 .orElseThrow(() -> new NoEntityException(id));
         loadedDoctor.setIsActive(false);
         repository.save(loadedDoctor);
