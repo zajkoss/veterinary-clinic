@@ -31,7 +31,7 @@ public class Doctor implements Serializable {
     private String nip;
 
     @Column(nullable = false)
-    private Boolean isActive = null;
+    private Boolean isActive;
 
     private DoctorType type;
 
