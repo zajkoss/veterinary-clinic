@@ -1,5 +1,7 @@
 package pl.kurs.veterinaryclinic.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import pl.kurs.veterinaryclinic.exception.EmptyIdException;
 import pl.kurs.veterinaryclinic.exception.NoEmptyIdException;
@@ -7,7 +9,6 @@ import pl.kurs.veterinaryclinic.exception.NoEntityException;
 import pl.kurs.veterinaryclinic.model.Doctor;
 import pl.kurs.veterinaryclinic.repository.DoctorRepository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -38,8 +39,8 @@ public class DoctorService implements IDoctorService {
     }
 
     @Override
-    public List<Doctor> getAll() {
-        return repository.findAll();
+    public Page<Doctor> getAll(Pageable pageable) {
+        return repository.findAll(pageable);
     }
 
     @Override
@@ -47,7 +48,7 @@ public class DoctorService implements IDoctorService {
         Doctor loadedDoctor = repository
                 .findById(Optional.ofNullable(id).orElseThrow(() -> new EmptyIdException()))
                 .orElseThrow(() -> new NoEntityException(id));
-        loadedDoctor.setActive(false);
+        loadedDoctor.setIsActive(false);
         repository.save(loadedDoctor);
     }
 }
