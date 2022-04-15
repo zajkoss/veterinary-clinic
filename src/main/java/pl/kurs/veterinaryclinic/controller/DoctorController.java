@@ -12,6 +12,7 @@ import pl.kurs.veterinaryclinic.dto.DoctorDto;
 import pl.kurs.veterinaryclinic.dto.StatusDto;
 import pl.kurs.veterinaryclinic.model.Doctor;
 import pl.kurs.veterinaryclinic.service.DoctorService;
+import pl.kurs.veterinaryclinic.service.IDoctorService;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 @Validated
 public class DoctorController {
 
-    private DoctorService doctorService;
+    private IDoctorService doctorService;
     private ModelMapper mapper;
 
     public DoctorController(DoctorService doctorService, ModelMapper mapper) {
