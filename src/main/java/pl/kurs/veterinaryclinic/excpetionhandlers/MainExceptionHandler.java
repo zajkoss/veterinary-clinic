@@ -9,6 +9,7 @@ import pl.kurs.veterinaryclinic.exception.EmptyIdException;
 import pl.kurs.veterinaryclinic.exception.NoEmptyIdException;
 import pl.kurs.veterinaryclinic.exception.NoEntityException;
 
+import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,5 +29,11 @@ public class MainExceptionHandler {
                 .map(e -> "Property: " + e.getField() + "; value: '" + e.getRejectedValue() + "'; message: " + e.getDefaultMessage()).collect(Collectors.toList());
         ExceptionResponse response = new ExceptionResponse(messages, ex.getClass().getSimpleName(), "BAD_REQUEST", LocalDateTime.now());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({EntityNotFoundException.class})
+    public ResponseEntity<ExceptionResponse> handleEntityNotFoundException(EntityNotFoundException ex) {
+        ExceptionResponse response = new ExceptionResponse(List.of(ex.getMessage()), ex.getClass().getSimpleName(), "NOT_FOUND", LocalDateTime.now());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 }

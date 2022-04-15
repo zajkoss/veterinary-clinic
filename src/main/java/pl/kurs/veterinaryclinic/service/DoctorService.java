@@ -9,6 +9,7 @@ import pl.kurs.veterinaryclinic.exception.NoEntityException;
 import pl.kurs.veterinaryclinic.model.Doctor;
 import pl.kurs.veterinaryclinic.repository.DoctorRepository;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 
 @Service
@@ -35,7 +36,7 @@ public class DoctorService implements IDoctorService {
     public Doctor get(Long id) {
         return repository
                 .findById(Optional.ofNullable(id).orElseThrow(() -> new EmptyIdException(id)))
-                .orElseThrow(() -> new NoEntityException(id));
+                .orElseThrow(() -> new EntityNotFoundException("" + id));
     }
 
     @Override
@@ -47,7 +48,7 @@ public class DoctorService implements IDoctorService {
     public void softDelete(Long id) {
         Doctor loadedDoctor = repository
                 .findById(Optional.ofNullable(id).orElseThrow(() -> new EmptyIdException(id)))
-                .orElseThrow(() -> new NoEntityException(id));
+                .orElseThrow(() -> new EntityNotFoundException("" + id));
         loadedDoctor.setIsActive(false);
         repository.save(loadedDoctor);
     }
