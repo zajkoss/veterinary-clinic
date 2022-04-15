@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(path = "/doctors")
+@RequestMapping(path = "/doctor")
 @Validated
 public class DoctorController {
 
@@ -58,7 +58,7 @@ public class DoctorController {
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.map(doctorService.add(newDoctor), DoctorDto.class));
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/fire/{id}")
     public ResponseEntity<StatusDto> softDeleteDoctor(@PathVariable("id") long id) {
         doctorService.softDelete(id);
         return ResponseEntity.ok().body(new StatusDto("" + id));
