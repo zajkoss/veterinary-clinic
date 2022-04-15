@@ -23,9 +23,6 @@ public class CreateDoctorCommand {
     @NIP
     private String nip;
 
-    @NotNull
-    private Boolean isActive;
-
     private DoctorType type;
 
     private AnimalType animalType;
@@ -44,10 +41,6 @@ public class CreateDoctorCommand {
 
     public String getNip() {
         return nip;
-    }
-
-    public Boolean getIsActive() {
-        return isActive;
     }
 
     public DoctorType getType() {

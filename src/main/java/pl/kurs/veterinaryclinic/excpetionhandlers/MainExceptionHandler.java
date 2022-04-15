@@ -5,10 +5,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import pl.kurs.veterinaryclinic.exception.DuplicatedValueEntityException;
 import pl.kurs.veterinaryclinic.exception.EmptyIdException;
 import pl.kurs.veterinaryclinic.exception.NoEmptyIdException;
 import pl.kurs.veterinaryclinic.exception.NoEntityException;
 
+import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,6 +29,12 @@ public class MainExceptionHandler {
         List<String> messages = ex.getFieldErrors().stream()
                 .map(e -> "Property: " + e.getField() + "; value: '" + e.getRejectedValue() + "'; message: " + e.getDefaultMessage()).collect(Collectors.toList());
         ExceptionResponse response = new ExceptionResponse(messages, ex.getClass().getSimpleName(), "BAD_REQUEST", LocalDateTime.now());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({DuplicatedValueEntityException.class})
+    public ResponseEntity<ExceptionResponse> handleEntityNotFoundException(DuplicatedValueEntityException ex) {
+        ExceptionResponse response = new ExceptionResponse(List.of(ex.getMessage()), ex.getClass().getSimpleName(), "BAD_REQUEST", LocalDateTime.now());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 }
