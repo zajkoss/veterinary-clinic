@@ -14,6 +14,7 @@ import pl.kurs.veterinaryclinic.model.Doctor;
 import pl.kurs.veterinaryclinic.service.DoctorService;
 import pl.kurs.veterinaryclinic.service.IDoctorService;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,8 +49,11 @@ public class DoctorController {
 
     @GetMapping("/{id}")
     public ResponseEntity<DoctorDto> getDoctorById(@PathVariable("id") long id) {
+
         return ResponseEntity.ok(
-                mapper.map(doctorService.get(id), DoctorDto.class)
+                mapper.map(doctorService.get(id).orElseThrow(
+                        () -> new EntityNotFoundException("" + id)
+                ), DoctorDto.class)
         );
     }
 
