@@ -111,4 +111,31 @@ public class Patient implements Serializable {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Patient patient = (Patient) o;
+        return Objects.equals(id, patient.id) && Objects.equals(name, patient.name) && Objects.equals(species, patient.species) && Objects.equals(breed, patient.breed) && Objects.equals(age, patient.age) && Objects.equals(ownerName, patient.ownerName) && Objects.equals(ownerSurname, patient.ownerSurname) && Objects.equals(email, patient.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, species, breed, age, ownerName, ownerSurname, email);
+    }
+
+    @Override
+    public String toString() {
+        return "Patient{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", species='" + species + '\'' +
+                ", breed='" + breed + '\'' +
+                ", age=" + age +
+                ", ownerName='" + ownerName + '\'' +
+                ", ownerSurname='" + ownerSurname + '\'' +
+                ", email='" + email + '\'' +
+                '}';
+    }
 }
