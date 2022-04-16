@@ -9,10 +9,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.kurs.veterinaryclinic.commands.CreatePatientCommand;
+import pl.kurs.veterinaryclinic.dto.DoctorDto;
 import pl.kurs.veterinaryclinic.dto.PatientDto;
 import pl.kurs.veterinaryclinic.model.Patient;
 import pl.kurs.veterinaryclinic.service.IPatientService;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,7 +50,9 @@ public class PatientController {
     @GetMapping("/{id}")
     public ResponseEntity<PatientDto> getPatientById(@PathVariable("id") long id) {
         return ResponseEntity.ok(
-                mapper.map(patientService.get(id), PatientDto.class)
+                mapper.map(patientService.get(id).orElseThrow(
+                        () -> new EntityNotFoundException("" + id)
+                ), PatientDto.class)
         );
     }
 

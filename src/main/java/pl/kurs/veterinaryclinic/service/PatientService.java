@@ -3,16 +3,12 @@ package pl.kurs.veterinaryclinic.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import pl.kurs.veterinaryclinic.exception.DuplicatedValueEntityException;
 import pl.kurs.veterinaryclinic.exception.EmptyIdException;
 import pl.kurs.veterinaryclinic.exception.NoEmptyIdException;
 import pl.kurs.veterinaryclinic.exception.NoEntityException;
-import pl.kurs.veterinaryclinic.model.Doctor;
 import pl.kurs.veterinaryclinic.model.Patient;
-import pl.kurs.veterinaryclinic.repository.DoctorRepository;
 import pl.kurs.veterinaryclinic.repository.PatientRepository;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 
 @Service
@@ -36,10 +32,9 @@ public class PatientService implements IPatientService {
     }
 
     @Override
-    public Patient get(Long id) {
+    public Optional<Patient> get(Long id) {
         return repository
-                .findById(Optional.ofNullable(id).orElseThrow(() -> new EmptyIdException(id)))
-                .orElseThrow(() -> new EntityNotFoundException("" + id));
+                .findById(Optional.ofNullable(id).orElseThrow(() -> new EmptyIdException(id)));
     }
 
     @Override
