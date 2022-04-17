@@ -4,6 +4,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import pl.kurs.veterinaryclinic.model.Doctor;
 import pl.kurs.veterinaryclinic.model.Patient;
 import pl.kurs.veterinaryclinic.model.Visit;
@@ -16,6 +18,7 @@ import pl.kurs.veterinaryclinic.repository.VisitRepository;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Properties;
 
 @Configuration
 public class BeansConfig {
@@ -57,4 +60,23 @@ public class BeansConfig {
 //            visitRepository.saveAll(Arrays.asList(visit1, visit2, visit3, visit4, visit5, visit6, visit7, visit8, visit9, visit10));
         };
     }
+
+    @Bean
+    public JavaMailSender getJavaMailSender() {
+        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+        mailSender.setHost("smtp.gmail.com");
+        mailSender.setPort(587);
+
+        mailSender.setUsername(Passes.emailUserName);
+        mailSender.setPassword(Passes.emailPassword);
+
+        Properties props = mailSender.getJavaMailProperties();
+        props.put("mail.transport.protocol", "smtp");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.debug", "true");
+
+        return mailSender;
+    }
+
 }
