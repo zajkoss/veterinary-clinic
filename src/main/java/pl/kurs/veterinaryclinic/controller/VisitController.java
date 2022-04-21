@@ -91,17 +91,18 @@ public class VisitController {
         LocalDateTime startTime = fromTime.withMinute(0).plusHours(1);
         while (startTime.isBefore(toTime)) {
             LocalDateTime finalStartTime = startTime;
+            int i = 0;
             result.addAll(
                 foundDoctors.stream()
                         .map(doctor -> mapDoctorToAvailableVisitDto(doctor, finalStartTime))
                         .filter(availableVisitDto -> !plannedVisit.contains(availableVisitDto))
-                        .limit(10)
                         .collect(Collectors.toList())
             );
             startTime = startTime.plusHours(1);
         }
 
-        return ResponseEntity.ok().body(result);
+
+        return ResponseEntity.ok().body(result.stream().limit(10).collect(Collectors.toList()));
 
     }
 
