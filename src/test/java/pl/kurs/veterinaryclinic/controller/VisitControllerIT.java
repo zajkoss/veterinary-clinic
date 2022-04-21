@@ -8,8 +8,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import pl.kurs.veterinaryclinic.VeterinaryClinicApplication;
+import pl.kurs.veterinaryclinic.commands.CreateVisitCommand;
 import pl.kurs.veterinaryclinic.dto.AvailableVisitDto;
 import pl.kurs.veterinaryclinic.model.Doctor;
 import pl.kurs.veterinaryclinic.model.Patient;
@@ -259,6 +261,193 @@ class VisitControllerIT {
                 .andExpect(jsonPath("$.exceptionTypeName").value("MethodArgumentTypeMismatchException"))
                 .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
     }
+
+    // not doctor +
+    // blank id +
+    // not doctor avtice +
+    // not patient +
+    //blank id +
+    // doktor/pacje ma juz wizyte +
+    // walidacje postawowe +
+    //ok
+    // full hour
+    // 8 - 20
+
+    @Test
+    public void shouldResponseBadRequestCodeWhenTryAddVisitWithIncorrectDoctorID() throws Exception {
+        CreateVisitCommand createVisitCommand = new CreateVisitCommand();
+        createVisitCommand.setDoctorIdentity(999L);
+        createVisitCommand.setPatientIdentity(patient1.getId());
+        createVisitCommand.setTime(LocalDateTime.of(2022, 5, 10, 15, 0));
+        //when
+        mockMvc.perform(post("/visit")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createVisitCommand)))
+                //then
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorMessages").isArray())
+                .andExpect(jsonPath("$.errorMessages", hasSize(1)))
+                .andExpect(jsonPath("$.errorMessages", hasItem("Doctor for provided id not found, id=999")))
+                .andExpect(jsonPath("$.exceptionTypeName").value("NotFoundRelationException"))
+                .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
+    }
+
+    @Test
+    public void shouldResponseBadRequestCodeWhenTryAddVisitWithEmptyDoctorID() throws Exception {
+        CreateVisitCommand createVisitCommand = new CreateVisitCommand();
+        createVisitCommand.setPatientIdentity(patient1.getId());
+        createVisitCommand.setTime(LocalDateTime.of(2022, 5, 10, 15, 0));
+        //when
+        mockMvc.perform(post("/visit")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createVisitCommand)))
+                //then
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorMessages").isArray())
+                .andExpect(jsonPath("$.errorMessages", hasSize(1)))
+                .andExpect(jsonPath("$.errorMessages", hasItem("id:null")))
+                .andExpect(jsonPath("$.exceptionTypeName").value("EmptyIdException"))
+                .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
+    }
+
+    @Test
+    public void shouldResponseBadRequestCodeWhenTryAddVisitWithInactiveDoctor() throws Exception {
+        CreateVisitCommand createVisitCommand = new CreateVisitCommand();
+        doctor4.setIsActive(false);
+        doctorRepository.save(doctor4);
+        createVisitCommand.setDoctorIdentity(doctor4.getId());
+        createVisitCommand.setPatientIdentity(patient1.getId());
+        createVisitCommand.setTime(LocalDateTime.of(2022, 5, 10, 15, 0));
+        //when
+        mockMvc.perform(post("/visit")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createVisitCommand)))
+                //then
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorMessages").isArray())
+                .andExpect(jsonPath("$.errorMessages", hasSize(1)))
+                .andExpect(jsonPath("$.errorMessages", hasItem("Doctor for provided id not found, id=" + doctor4.getId())))
+                .andExpect(jsonPath("$.exceptionTypeName").value("NotFoundRelationException"))
+                .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
+    }
+
+
+    @Test
+    public void shouldResponseBadRequestCodeWhenTryAddVisitWithIncorrectPatientID() throws Exception {
+        CreateVisitCommand createVisitCommand = new CreateVisitCommand();
+        createVisitCommand.setDoctorIdentity(doctor1.getId());
+        createVisitCommand.setPatientIdentity(999L);
+        createVisitCommand.setTime(LocalDateTime.of(2022, 5, 10, 15, 0));
+        //when
+        mockMvc.perform(post("/visit")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createVisitCommand)))
+                //then
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorMessages").isArray())
+                .andExpect(jsonPath("$.errorMessages", hasSize(1)))
+                .andExpect(jsonPath("$.errorMessages", hasItem("Patient for provided id not found, id=999")))
+                .andExpect(jsonPath("$.exceptionTypeName").value("NotFoundRelationException"))
+                .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
+    }
+
+    @Test
+    public void shouldResponseBadRequestCodeWhenTryAddVisitWithEmptyPatientID() throws Exception {
+        CreateVisitCommand createVisitCommand = new CreateVisitCommand();
+        createVisitCommand.setDoctorIdentity(doctor1.getId());
+        createVisitCommand.setTime(LocalDateTime.of(2022, 5, 10, 15, 0));
+        //when
+        mockMvc.perform(post("/visit")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createVisitCommand)))
+                //then
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorMessages").isArray())
+                .andExpect(jsonPath("$.errorMessages", hasSize(1)))
+                .andExpect(jsonPath("$.errorMessages", hasItem("id:null")))
+                .andExpect(jsonPath("$.exceptionTypeName").value("EmptyIdException"))
+                .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
+    }
+
+    @Test
+    public void shouldResponseBadRequestCodeWhenTryAddVisitForDoctorWhoHasAlreadyVisit() throws Exception {
+        CreateVisitCommand createVisitCommand = new CreateVisitCommand();
+        createVisitCommand.setDoctorIdentity(doctor1.getId());
+        createVisitCommand.setPatientIdentity(patient2.getId());
+        createVisitCommand.setTime(LocalDateTime.of(2022, 5, 10, 10, 0));
+        //when
+        mockMvc.perform(post("/visit")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createVisitCommand)))
+                //then
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorMessages").isArray())
+                .andExpect(jsonPath("$.errorMessages", hasSize(1)))
+                .andExpect(jsonPath("$.errorMessages", hasItem("Doctor already has visit that date")))
+                .andExpect(jsonPath("$.exceptionTypeName").value("VisitMemberException"))
+                .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
+    }
+
+
+    @Test
+    public void shouldResponseBadRequestCodeWhenTryAddVisitForPatientWhoHasAlreadyVisit() throws Exception {
+        CreateVisitCommand createVisitCommand = new CreateVisitCommand();
+        createVisitCommand.setDoctorIdentity(doctor2.getId());
+        createVisitCommand.setPatientIdentity(patient1.getId());
+        createVisitCommand.setTime(LocalDateTime.of(2022, 5, 10, 10, 0));
+        //when
+        mockMvc.perform(post("/visit")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createVisitCommand)))
+                //then
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorMessages").isArray())
+                .andExpect(jsonPath("$.errorMessages", hasSize(1)))
+                .andExpect(jsonPath("$.errorMessages", hasItem("Patient already has visit that date")))
+                .andExpect(jsonPath("$.exceptionTypeName").value("VisitMemberException"))
+                .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
+    }
+
+
+    @Test
+    public void shouldResponseBadRequestCodeWhenTryAddVisitWithNotFullHour() throws Exception {
+        CreateVisitCommand createVisitCommand = new CreateVisitCommand();
+        createVisitCommand.setDoctorIdentity(doctor2.getId());
+        createVisitCommand.setPatientIdentity(patient1.getId());
+        createVisitCommand.setTime(LocalDateTime.of(2022, 5, 10, 17, 15));
+        //when
+        mockMvc.perform(post("/visit")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createVisitCommand)))
+                //then
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorMessages").isArray())
+                .andExpect(jsonPath("$.errorMessages", hasSize(1)))
+                .andExpect(jsonPath("$.errorMessages", hasItem("Visit can only be scheduled on full hour, visitTime=2022-05-10T17:15")))
+                .andExpect(jsonPath("$.exceptionTypeName").value("VisitTimeException"))
+                .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
+    }
+
+
+    @Test
+    public void shouldResponseBadRequestCodeWhenTryAddVisitNotBetweenCorrectTime() throws Exception {
+        CreateVisitCommand createVisitCommand = new CreateVisitCommand();
+        createVisitCommand.setDoctorIdentity(doctor2.getId());
+        createVisitCommand.setPatientIdentity(patient1.getId());
+        createVisitCommand.setTime(LocalDateTime.of(2022, 5, 10, 1, 0));
+        //when
+        mockMvc.perform(post("/visit")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createVisitCommand)))
+                //then
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorMessages").isArray())
+                .andExpect(jsonPath("$.errorMessages", hasSize(1)))
+                .andExpect(jsonPath("$.errorMessages", hasItem("Visit can only be scheduled between 8 a.m and 8 p.m, visitTime=2022-05-10T01:00")))
+                .andExpect(jsonPath("$.exceptionTypeName").value("VisitTimeException"))
+                .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
+    }
+
 
 
 }
