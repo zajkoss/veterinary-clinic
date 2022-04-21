@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import pl.kurs.veterinaryclinic.exception.*;
 
 import javax.persistence.EntityNotFoundException;
@@ -41,6 +42,12 @@ public class MainExceptionHandler {
     @ExceptionHandler({DuplicatedValueEntityException.class, VisitTimeException.class, WrongVisitStatusException.class,NotFoundRelationException.class})
     public ResponseEntity<ExceptionResponse> handleEntityNotFoundException(RuntimeException ex) {
         ExceptionResponse response = new ExceptionResponse(List.of(ex.getMessage()), ex.getClass().getSimpleName(), "BAD_REQUEST", LocalDateTime.now());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({MethodArgumentTypeMismatchException .class})
+    public ResponseEntity<ExceptionResponse> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException  ex) {
+        ExceptionResponse response = new ExceptionResponse(List.of("Method argument mismatch field: " + ex.getName()), ex.getClass().getSimpleName(), "BAD_REQUEST", LocalDateTime.now());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
