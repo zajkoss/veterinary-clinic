@@ -33,8 +33,8 @@ public class DoctorService implements IDoctorService {
         if (doctor.getId() != null)
             throw new NoEmptyIdException(doctor.getId());
 
-        if(repository.findDoctorByNipEquals(doctor.getNip()).isPresent())
-            throw new DuplicatedValueEntityException("nip",doctor.getNip());
+        if (repository.findDoctorByNipEquals(doctor.getNip()).isPresent())
+            throw new DuplicatedValueEntityException("nip", doctor.getNip());
 
         doctor.setIsActive(true);
         return repository.save(doctor);
@@ -46,10 +46,14 @@ public class DoctorService implements IDoctorService {
     }
 
     @Override
+    public Optional<Doctor> getActiveById(Long id) {
+        return repository.findDoctorByIdAndIsActiveTrue(Optional.ofNullable(id).orElseThrow(() -> new EmptyIdException(id)));
+    }
+
+    @Override
     public Page<Doctor> getAll(Pageable pageable) {
         return repository.findAll(pageable);
     }
-
 
 
     @Override
@@ -64,15 +68,13 @@ public class DoctorService implements IDoctorService {
     @Override
     public List<Doctor> getAllForParameters(DoctorType doctorType, AnimalType animalType) {
         List<Doctor> foundDoctors;
-        if(doctorType == null && animalType == null){
-            return repository.findAll();
-        }else {
-            Doctor searchDoctor = new Doctor();
-            if(doctorType != null)
-                searchDoctor.setType(doctorType);
-            if(animalType != null)
-                searchDoctor.setAnimalType(animalType);
-            return repository.findAll(Example.of(searchDoctor));
-        }
+        Doctor searchDoctor = new Doctor();
+        searchDoctor.setIsActive(true);
+        if (doctorType != null)
+            searchDoctor.setType(doctorType);
+        if (animalType != null)
+            searchDoctor.setAnimalType(animalType);
+        return repository.findAll(Example.of(searchDoctor));
+
     }
 }
