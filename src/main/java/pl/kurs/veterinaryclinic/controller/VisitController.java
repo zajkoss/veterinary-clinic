@@ -45,11 +45,11 @@ public class VisitController {
 
     @PostMapping
     public ResponseEntity<CreatedEntityDto> addVisit(@RequestBody @Valid CreateVisitCommand createVisitCommand) {
-        Doctor loadDoctor = doctorService.get(createVisitCommand.getDoctorIdentity()).orElseThrow(
+        Doctor loadDoctor = doctorService.getActiveById(createVisitCommand.getDoctorIdentity()).orElseThrow(
                 () -> new NotFoundRelationException("Doctor for provided id not found",createVisitCommand.getDoctorIdentity())
         );
         Patient loadPatient = patientService.get(createVisitCommand.getPatientIdentity()).orElseThrow(
-                () -> new NotFoundRelationException("Doctor for provided id not found",createVisitCommand.getDoctorIdentity())
+                () -> new NotFoundRelationException("Patient for provided id not found",createVisitCommand.getPatientIdentity())
         );
 
         Visit visit = mapper.map(createVisitCommand, Visit.class);
