@@ -39,7 +39,7 @@ public class MainExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({DuplicatedValueEntityException.class, VisitTimeException.class, WrongVisitStatusException.class,NotFoundRelationException.class})
+    @ExceptionHandler({DuplicatedValueEntityException.class, VisitTimeException.class, WrongVisitStatusException.class,NotFoundRelationException.class,VisitMemberException.class})
     public ResponseEntity<ExceptionResponse> handleEntityNotFoundException(RuntimeException ex) {
         ExceptionResponse response = new ExceptionResponse(List.of(ex.getMessage()), ex.getClass().getSimpleName(), "BAD_REQUEST", LocalDateTime.now());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
