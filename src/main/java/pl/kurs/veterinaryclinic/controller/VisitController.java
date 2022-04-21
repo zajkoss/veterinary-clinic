@@ -92,14 +92,15 @@ public class VisitController {
         while (startTime.isBefore(toTime)) {
             LocalDateTime finalStartTime = startTime;
             result.addAll(
-                foundDoctors.stream().map(doctor -> mapDoctorToAvailableVisitDto(doctor, finalStartTime)).collect(Collectors.toList())
+                foundDoctors.stream()
+                        .map(doctor -> mapDoctorToAvailableVisitDto(doctor, finalStartTime))
+                        .filter(availableVisitDto -> !plannedVisit.contains(availableVisitDto))
+                        .limit(10)
+                        .collect(Collectors.toList())
             );
             startTime = startTime.plusHours(1);
         }
 
-        //Delete reserved visit
-        result.removeAll(plannedVisit);
-        List<AvailableVisitDto> result2 = result;
         return ResponseEntity.ok().body(result);
 
     }
