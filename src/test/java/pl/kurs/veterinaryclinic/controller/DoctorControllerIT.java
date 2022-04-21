@@ -24,6 +24,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -238,8 +239,10 @@ class DoctorControllerIT {
         //then
         List<Doctor> doctorsResponse = objectMapper.readValue(responseJson, new TypeReference<List<Doctor>>() {});
         assertEquals(5, doctorsResponse.size());
-        assertEquals(doctors.get(0), doctorsResponse.get(0));
-        assertEquals(doctors.get(4), doctorsResponse.get(4));
+        for (int i = 0; i < doctorsResponse.size(); i++) {
+            if(i != 0 )
+                assertTrue(doctorsResponse.get(i).getId() > doctorsResponse.get(i-1).getId());
+        }
     }
 
 
