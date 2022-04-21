@@ -1,5 +1,7 @@
 package pl.kurs.veterinaryclinic.dto;
 
+import java.util.Objects;
+
 public class PatientDto {
 
     private Long id;
@@ -80,5 +82,18 @@ public class PatientDto {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PatientDto that = (PatientDto) o;
+        return Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(species, that.species) && Objects.equals(breed, that.breed) && Objects.equals(age, that.age) && Objects.equals(ownerName, that.ownerName) && Objects.equals(ownerSurname, that.ownerSurname) && Objects.equals(email, that.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, species, breed, age, ownerName, ownerSurname, email);
     }
 }
