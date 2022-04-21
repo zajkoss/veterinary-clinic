@@ -53,4 +53,28 @@ public class CreateDoctorCommand {
     public String  getAnimalType() {
         return animalType;
     }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public void setSalary(BigDecimal salary) {
+        this.salary = salary;
+    }
+
+    public void setNip(String nip) {
+        this.nip = nip;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setAnimalType(String animalType) {
+        this.animalType = animalType;
+    }
 }
