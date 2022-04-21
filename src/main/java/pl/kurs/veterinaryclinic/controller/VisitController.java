@@ -88,20 +88,22 @@ public class VisitController {
         List<AvailableVisitDto> plannedVisit = visitService.findAllVisitInTime(fromTime, toTime).stream().map(this::mapVisitToAvailableVisitDto).collect(Collectors.toList());
 
         List<AvailableVisitDto> result = new ArrayList<>();
-        LocalDateTime startTime = fromTime.withMinute(0).plusHours(1);
+        LocalDateTime startTime = fromTime;
+        if(startTime.getMinute() != 0 || startTime.getSecond() != 0)
+            startTime = startTime.withMinute(0).withSecond(0).plusHours(1);
+
         while (startTime.isBefore(toTime)) {
             LocalDateTime finalStartTime = startTime;
-            int i = 0;
-            result.addAll(
-                foundDoctors.stream()
-                        .map(doctor -> mapDoctorToAvailableVisitDto(doctor, finalStartTime))
-                        .filter(availableVisitDto -> !plannedVisit.contains(availableVisitDto))
-                        .collect(Collectors.toList())
-            );
+            if(finalStartTime.getHour() >= 8 && finalStartTime.getHour() <= 20) {
+                result.addAll(
+                        foundDoctors.stream()
+                                .map(doctor -> mapDoctorToAvailableVisitDto(doctor, finalStartTime))
+                                .filter(availableVisitDto -> !plannedVisit.contains(availableVisitDto))
+                                .collect(Collectors.toList())
+                );
+            }
             startTime = startTime.plusHours(1);
         }
-
-
         return ResponseEntity.ok().body(result.stream().limit(10).collect(Collectors.toList()));
 
     }

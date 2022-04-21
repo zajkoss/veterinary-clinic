@@ -32,7 +32,7 @@ public class VisitService implements IVisitService {
             throw new NoEmptyIdException(visit.getId());
 
         // full hour
-        if (visit.getTime().getMinute() != 0)
+        if (visit.getTime().getMinute() != 0 || visit.getTime().getSecond() != 0)
             throw new VisitTimeException("Visit can only be scheduled on full hour",visit.getTime());
 
         // 8 - 20
@@ -75,7 +75,7 @@ public class VisitService implements IVisitService {
 
     @Override
     public List<Visit> findAllVisitInTime(LocalDateTime fromTime, LocalDateTime toTime) {
-        return repository.findAllByTimeAfterAndTimeBeforeOrderByTime(fromTime, toTime);
+        return repository.findAllByTimeAfterAndTimeBeforeOrderByTime(fromTime.minusSeconds(1), toTime);
     }
 
 
