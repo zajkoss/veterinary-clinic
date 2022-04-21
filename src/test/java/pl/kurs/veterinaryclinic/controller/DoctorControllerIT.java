@@ -1,5 +1,6 @@
 package pl.kurs.veterinaryclinic.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -17,6 +18,8 @@ import pl.kurs.veterinaryclinic.model.enums.DoctorType;
 import pl.kurs.veterinaryclinic.repository.DoctorRepository;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
@@ -105,14 +108,14 @@ class DoctorControllerIT {
         mockMvc.perform(post("/doctor")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(createDoctorCommandJson))
-                        //then
-                        .andExpect(status().isBadRequest())
-                        .andExpect(jsonPath("$.errorMessages").isArray())
-                        .andExpect(jsonPath("$.errorMessages", hasSize(2)))
-                        .andExpect(jsonPath("$.errorMessages", hasItem("Property: name; value: ''; message: must not be blank")))
-                        .andExpect(jsonPath("$.errorMessages", hasItem("Property: surname; value: ''; message: must not be blank")))
-                        .andExpect(jsonPath("$.exceptionTypeName").value("MethodArgumentNotValidException"))
-                        .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
+                //then
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorMessages").isArray())
+                .andExpect(jsonPath("$.errorMessages", hasSize(2)))
+                .andExpect(jsonPath("$.errorMessages", hasItem("Property: name; value: ''; message: must not be blank")))
+                .andExpect(jsonPath("$.errorMessages", hasItem("Property: surname; value: ''; message: must not be blank")))
+                .andExpect(jsonPath("$.exceptionTypeName").value("MethodArgumentNotValidException"))
+                .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
     }
 
     @Test
@@ -213,8 +216,30 @@ class DoctorControllerIT {
     }
 
     @Test
-    public void shouldFirstFiveDoctors() {
+    public void shouldFindFirstFiveDoctorsOrderAscendingById() throws Exception {
+        //given
+        List<Doctor> doctors = Arrays.asList(
+                new Doctor("Katarzyna", "Lewandowska", new BigDecimal("56.00"), "1234567894", true, DoctorType.DENTIST, AnimalType.HORSE),
+                new Doctor("Anna", "Kowalczyk", new BigDecimal("44.00"), "1334567895", true, DoctorType.SURGEON, AnimalType.DOG),
+                new Doctor("Anna", "Kowalczyk", new BigDecimal("44.00"), "1434567895", true, DoctorType.SURGEON, AnimalType.DOG),
+                new Doctor("Anna", "Kowalczyk", new BigDecimal("44.00"), "1534567895", true, DoctorType.SURGEON, AnimalType.DOG),
+                new Doctor("Anna", "Kowalczyk", new BigDecimal("44.00"), "1634567895", true, DoctorType.SURGEON, AnimalType.DOG),
+                new Doctor("Anna", "Kowalczyk", new BigDecimal("44.00"), "1734567895", true, DoctorType.SURGEON, AnimalType.DOG)
+        );
+        doctorRepository.saveAll(doctors);
 
+        String responseJson = mockMvc.perform(get("/doctor/")
+                        .param("size","5")
+                        .param("page","0"))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        //then
+        List<Doctor> doctorsResponse = objectMapper.readValue(responseJson, new TypeReference<List<Doctor>>() {});
+        assertEquals(5, doctorsResponse.size());
+        assertEquals(doctors.get(0), doctorsResponse.get(0));
+        assertEquals(doctors.get(4), doctorsResponse.get(4));
     }
 
 
