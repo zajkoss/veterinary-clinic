@@ -79,8 +79,8 @@ public class VisitController {
             @RequestParam(required = false, name = "from")  LocalDateTime fromTime,
             @RequestParam(required = false, name = "to")  LocalDateTime toTime
     ) {
-        DoctorType doctorType = type == null ? null : DoctorType.valueOf(type);
-        AnimalType animalType = animal == null ? null : AnimalType.valueOf(animal);
+        DoctorType doctorType = type == null ? null : DoctorType.valueOf(type.toUpperCase());
+        AnimalType animalType = animal == null ? null : AnimalType.valueOf(animal.toUpperCase());
         List<Doctor> foundDoctors = doctorService.getAllForParameters(doctorType,animalType);
 
         if(fromTime == null) fromTime = LocalDateTime.now();
