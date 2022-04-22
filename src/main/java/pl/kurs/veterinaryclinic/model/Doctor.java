@@ -37,6 +37,9 @@ public class Doctor implements Serializable {
 
     private AnimalType animalType;
 
+    @Version
+    private Integer version;
+
     public Doctor() {}
 
     public Doctor(String name, String surname, BigDecimal salary, String nip, Boolean isActive, DoctorType type, AnimalType animalType) {
