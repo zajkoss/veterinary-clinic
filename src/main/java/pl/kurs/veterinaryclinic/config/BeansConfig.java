@@ -17,6 +17,11 @@ import pl.kurs.veterinaryclinic.model.enums.DoctorType;
 import pl.kurs.veterinaryclinic.repository.DoctorRepository;
 import pl.kurs.veterinaryclinic.repository.PatientRepository;
 import pl.kurs.veterinaryclinic.repository.VisitRepository;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -89,6 +94,15 @@ public class BeansConfig {
         eventMulticaster = new SimpleApplicationEventMulticaster();
         eventMulticaster.setTaskExecutor(new SimpleAsyncTaskExecutor());
         return eventMulticaster;
+    }
+
+    @Bean
+    public Docket api() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .select()
+                .apis(RequestHandlerSelectors.any())
+                .paths(PathSelectors.any())
+                .build();
     }
 
 
