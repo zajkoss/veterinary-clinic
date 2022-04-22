@@ -262,16 +262,6 @@ class VisitControllerIT {
                 .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
     }
 
-    // not doctor +
-    // blank id +
-    // not doctor avtice +
-    // not patient +
-    //blank id +
-    // doktor/pacje ma juz wizyte +
-    // walidacje postawowe +
-    //ok
-    // full hour
-    // 8 - 20
 
     @Test
     public void shouldResponseBadRequestCodeWhenTryAddVisitWithIncorrectDoctorID() throws Exception {
