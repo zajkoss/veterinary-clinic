@@ -48,7 +48,7 @@ class DoctorControllerIT {
     @Test
     public void shouldGetSingleDoctor() throws Exception {
         //given -
-        Doctor doctorAdam = doctorRepository.save(new Doctor("Adam", "Janko", new BigDecimal("110.00"), "1234567891", true, DoctorType.CARDIOLOGIST, AnimalType.DOG));
+        Doctor doctorAdam = doctorRepository.save(new Doctor("Adam", "Janko", new BigDecimal("110.00"), "1114567891", true, DoctorType.CARDIOLOGIST, AnimalType.DOG));
         //when
         String responseJson = mockMvc.perform(get("/doctor/" + doctorAdam.getId()))
                 .andExpect(status().isOk())
@@ -76,7 +76,7 @@ class DoctorControllerIT {
     @Test
     public void shouldAddNewDoctor() throws Exception {
         //given
-        Doctor doctor = new Doctor("Jan", "Kowalski", new BigDecimal("100.00"), "1234567890", true, DoctorType.EYE_DOCTOR, AnimalType.CAT);
+        Doctor doctor = new Doctor("Jan", "Kowalski", new BigDecimal("100.00"), "1234597890", true, DoctorType.EYE_DOCTOR, AnimalType.CAT);
         DoctorDto doctorDto = modelMapper.map(doctor, DoctorDto.class);
         String createDoctorCommandJson = objectMapper.writeValueAsString(modelMapper.map(doctor, CreateDoctorCommand.class));
         //when
