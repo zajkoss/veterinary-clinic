@@ -8,7 +8,7 @@ import pl.kurs.veterinaryclinic.repository.ConfirmationTokenRepository;
 import pl.kurs.veterinaryclinic.repository.VisitRepository;
 
 import javax.persistence.EntityNotFoundException;
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;

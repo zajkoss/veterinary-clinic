@@ -9,7 +9,7 @@ import pl.kurs.veterinaryclinic.exception.NoEntityException;
 import pl.kurs.veterinaryclinic.model.Patient;
 import pl.kurs.veterinaryclinic.repository.PatientRepository;
 
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Service
