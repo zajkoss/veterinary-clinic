@@ -45,11 +45,11 @@ public class VisitController {
 
     @PostMapping
     public ResponseEntity<CreatedEntityDto> addVisit(@RequestBody @Valid CreateVisitCommand createVisitCommand) {
-        Doctor loadDoctor = doctorService.get(createVisitCommand.getDoctorIdentity()).orElseThrow(
+        Doctor loadDoctor = doctorService.getActiveById(createVisitCommand.getDoctorIdentity()).orElseThrow(
                 () -> new NotFoundRelationException("Doctor for provided id not found",createVisitCommand.getDoctorIdentity())
         );
         Patient loadPatient = patientService.get(createVisitCommand.getPatientIdentity()).orElseThrow(
-                () -> new NotFoundRelationException("Doctor for provided id not found",createVisitCommand.getDoctorIdentity())
+                () -> new NotFoundRelationException("Patient for provided id not found",createVisitCommand.getPatientIdentity())
         );
 
         Visit visit = mapper.map(createVisitCommand, Visit.class);
@@ -79,8 +79,8 @@ public class VisitController {
             @RequestParam(required = false, name = "from")  LocalDateTime fromTime,
             @RequestParam(required = false, name = "to")  LocalDateTime toTime
     ) {
-        DoctorType doctorType = type == null ? null : DoctorType.valueOf(type);
-        AnimalType animalType = animal == null ? null : AnimalType.valueOf(animal);
+        DoctorType doctorType = type == null ? null : DoctorType.valueOf(type.toUpperCase());
+        AnimalType animalType = animal == null ? null : AnimalType.valueOf(animal.toUpperCase());
         List<Doctor> foundDoctors = doctorService.getAllForParameters(doctorType,animalType);
 
         if(fromTime == null) fromTime = LocalDateTime.now();
@@ -88,19 +88,23 @@ public class VisitController {
         List<AvailableVisitDto> plannedVisit = visitService.findAllVisitInTime(fromTime, toTime).stream().map(this::mapVisitToAvailableVisitDto).collect(Collectors.toList());
 
         List<AvailableVisitDto> result = new ArrayList<>();
-        LocalDateTime startTime = fromTime.withMinute(0).plusHours(1);
+        LocalDateTime startTime = fromTime;
+        if(startTime.getMinute() != 0 || startTime.getSecond() != 0)
+            startTime = startTime.withMinute(0).withSecond(0).plusHours(1);
+
         while (startTime.isBefore(toTime)) {
             LocalDateTime finalStartTime = startTime;
-            result.addAll(
-                foundDoctors.stream().map(doctor -> mapDoctorToAvailableVisitDto(doctor, finalStartTime)).collect(Collectors.toList())
-            );
+            if(finalStartTime.getHour() >= 8 && finalStartTime.getHour() <= 20) {
+                result.addAll(
+                        foundDoctors.stream()
+                                .map(doctor -> mapDoctorToAvailableVisitDto(doctor, finalStartTime))
+                                .filter(availableVisitDto -> !plannedVisit.contains(availableVisitDto))
+                                .collect(Collectors.toList())
+                );
+            }
             startTime = startTime.plusHours(1);
         }
-
-        //Delete reserved visit
-        result.removeAll(plannedVisit);
-        List<AvailableVisitDto> result2 = result;
-        return ResponseEntity.ok().body(result);
+        return ResponseEntity.ok().body(result.stream().limit(10).collect(Collectors.toList()));
 
     }
 

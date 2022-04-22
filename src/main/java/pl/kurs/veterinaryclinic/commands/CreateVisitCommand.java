@@ -26,4 +26,18 @@ public class CreateVisitCommand {
     public LocalDateTime getTime() {
         return time;
     }
+
+    public void setDoctorIdentity(Long doctorIdentity) {
+        this.doctorIdentity = doctorIdentity;
+    }
+
+    public void setPatientIdentity(Long patientIdentity) {
+        this.patientIdentity = patientIdentity;
+    }
+
+    public void setTime(LocalDateTime time) {
+        this.time = time;
+    }
+
+
 }

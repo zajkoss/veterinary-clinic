@@ -32,12 +32,18 @@ public class VisitService implements IVisitService {
             throw new NoEmptyIdException(visit.getId());
 
         // full hour
-        if (visit.getTime().getMinute() != 0)
+        if (visit.getTime().getMinute() != 0 || visit.getTime().getSecond() != 0)
             throw new VisitTimeException("Visit can only be scheduled on full hour",visit.getTime());
 
         // 8 - 20
-        if(visit.getTime().getHour() < 8 && visit.getTime().getHour() > 20)
+        if(visit.getTime().getHour() < 8 || visit.getTime().getHour() > 20)
             throw new VisitTimeException("Visit can only be scheduled between 8 a.m and 8 p.m",visit.getTime());
+
+        if(repository.findByDoctorIdAndTime(visit.getDoctor().getId(),visit.getTime()).isPresent())
+            throw new VisitMemberException("Doctor already has visit that date");
+
+        if(repository.findByPatientIdAndTime(visit.getPatient().getId(),visit.getTime()).isPresent())
+            throw  new VisitMemberException("Patient already has visit that date");
 
         return repository.save(visit);
     }
@@ -75,7 +81,7 @@ public class VisitService implements IVisitService {
 
     @Override
     public List<Visit> findAllVisitInTime(LocalDateTime fromTime, LocalDateTime toTime) {
-        return repository.findAllByTimeAfterAndTimeBeforeOrderByTime(fromTime, toTime);
+        return repository.findAllByTimeAfterAndTimeBeforeOrderByTime(fromTime.minusSeconds(1), toTime);
     }
 
 

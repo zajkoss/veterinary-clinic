@@ -21,6 +21,6 @@ public class EnumsValidatorValidator implements ConstraintValidator<EnumsValidat
         if (charSequence == null) {
             return true;
         }
-        return availableValues.contains(charSequence.toString());
+        return availableValues.contains(charSequence.toString().toUpperCase());
     }
 }
