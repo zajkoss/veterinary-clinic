@@ -16,6 +16,8 @@ public interface IVisitService {
             LocalDateTime fromTime,
             LocalDateTime toTime
     );
+    List<Visit> findAllVisitForNextDayWithoutSendReminder();
+    void setReminderOfVisit(Visit visit);
 
     void createConfirmationToken(Visit visit, String token);
     Optional<ConfirmationToken> getConfirmationToken(String confirmationToken);
