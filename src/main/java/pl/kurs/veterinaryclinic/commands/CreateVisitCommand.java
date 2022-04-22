@@ -1,6 +1,7 @@
 package pl.kurs.veterinaryclinic.commands;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import pl.kurs.veterinaryclinic.validators.VisitTime;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +13,7 @@ public class CreateVisitCommand {
     private Long patientIdentity;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @VisitTime
     private LocalDateTime time;
 
 

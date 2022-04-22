@@ -14,10 +14,12 @@ import pl.kurs.veterinaryclinic.model.enums.DoctorType;
 import pl.kurs.veterinaryclinic.repository.DoctorRepository;
 
 import javax.persistence.EntityNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class DoctorService implements IDoctorService {
 
     private DoctorRepository repository;

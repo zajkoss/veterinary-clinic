@@ -3,12 +3,14 @@ package pl.kurs.veterinaryclinic.controller;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.type.ShortType;
 import org.modelmapper.ModelMapper;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.kurs.veterinaryclinic.commands.CreateVisitCommand;
 import pl.kurs.veterinaryclinic.dto.*;
+import pl.kurs.veterinaryclinic.events.OnMakeVisitEvent;
 import pl.kurs.veterinaryclinic.exception.NotFoundRelationException;
 import pl.kurs.veterinaryclinic.model.Doctor;
 import pl.kurs.veterinaryclinic.model.Patient;
@@ -20,6 +22,7 @@ import pl.kurs.veterinaryclinic.service.IPatientService;
 import pl.kurs.veterinaryclinic.service.IVisitService;
 import pl.kurs.veterinaryclinic.validators.EnumsValidator;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,16 +38,21 @@ public class VisitController {
     private IPatientService patientService;
     private IDoctorService doctorService;
     private ModelMapper mapper;
+    private ApplicationEventPublisher applicationEventPublisher;
 
-    public VisitController(IVisitService visitService, IPatientService patientService, IDoctorService doctorService, ModelMapper mapper) {
+    public VisitController(IVisitService visitService, IPatientService patientService, IDoctorService doctorService, ModelMapper mapper, ApplicationEventPublisher applicationEventPublisher) {
         this.visitService = visitService;
         this.patientService = patientService;
         this.doctorService = doctorService;
         this.mapper = mapper;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     @PostMapping
-    public ResponseEntity<CreatedEntityDto> addVisit(@RequestBody @Valid CreateVisitCommand createVisitCommand) {
+    public ResponseEntity<CreatedEntityDto> addVisit(
+            @RequestBody @Valid CreateVisitCommand createVisitCommand,
+                HttpServletRequest request
+    ) {
         Doctor loadDoctor = doctorService.getActiveById(createVisitCommand.getDoctorIdentity()).orElseThrow(
                 () -> new NotFoundRelationException("Doctor for provided id not found",createVisitCommand.getDoctorIdentity())
         );
@@ -55,19 +63,21 @@ public class VisitController {
         Visit visit = mapper.map(createVisitCommand, Visit.class);
         visit.setDoctor(loadDoctor);
         visit.setPatient(loadPatient);
-        return ResponseEntity.ok().body(
-                new CreatedEntityDto(visitService.add(visit).getId())
-        );
+        Visit createdVisit = visitService.add(visit);
+
+        applicationEventPublisher.publishEvent(new OnMakeVisitEvent(createdVisit,request.getRequestURL().toString().replace("/visit","")));
+
+        return ResponseEntity.ok().body(new CreatedEntityDto(createdVisit.getId()));
     }
 
     @GetMapping("/confirm/{token}")
-    public ResponseEntity<ConfirmRequestWithMessageDto> confirmVisit(@PathVariable("token") Long token) {
+    public ResponseEntity<ConfirmRequestWithMessageDto> confirmVisit(@PathVariable("token") String token) {
         visitService.confirm(token);
         return ResponseEntity.ok().body(new ConfirmRequestWithMessageDto("Visit confirmed"));
     }
 
     @GetMapping("/cancel/{token}")
-    public ResponseEntity<ConfirmRequestWithMessageDto> cancelVisit(@PathVariable("token") Long token) {
+    public ResponseEntity<ConfirmRequestWithMessageDto> cancelVisit(@PathVariable("token") String token) {
         visitService.delete(token);
         return ResponseEntity.ok().body(new ConfirmRequestWithMessageDto("Visit canceled"));
     }
