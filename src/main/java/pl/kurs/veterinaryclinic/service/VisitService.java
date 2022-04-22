@@ -32,17 +32,6 @@ public class VisitService implements IVisitService {
             throw new NoEntityException();
         if (visit.getId() != null)
             throw new NoEmptyIdException(visit.getId());
-        //future
-        if(visit.getTime().isBefore(LocalDateTime.now()))
-            throw new VisitTimeException("Visit can only be scheduled in future", visit.getTime());
-
-        // full hour
-        if (visit.getTime().getMinute() != 0 || visit.getTime().getSecond() != 0)
-            throw new VisitTimeException("Visit can only be scheduled on full hour", visit.getTime());
-
-        // 8 - 20
-        if (visit.getTime().getHour() < 8 || visit.getTime().getHour() > 20)
-            throw new VisitTimeException("Visit can only be scheduled between 8 a.m and 8 p.m", visit.getTime());
 
         if (repository.findByDoctorIdAndTime(visit.getDoctor().getId(), visit.getTime()).isPresent())
             throw new VisitMemberException("Doctor already has visit that date");

@@ -413,8 +413,8 @@ class VisitControllerIT {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorMessages").isArray())
                 .andExpect(jsonPath("$.errorMessages", hasSize(1)))
-                .andExpect(jsonPath("$.errorMessages", hasItem("Visit can only be scheduled on full hour, visitTime=2022-05-10T17:15")))
-                .andExpect(jsonPath("$.exceptionTypeName").value("VisitTimeException"))
+                .andExpect(jsonPath("$.errorMessages", hasItem("Property: time; value: '2022-05-10T17:15'; message: Wrong visit time")))
+                .andExpect(jsonPath("$.exceptionTypeName").value("MethodArgumentNotValidException"))
                 .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
     }
 
@@ -433,8 +433,28 @@ class VisitControllerIT {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorMessages").isArray())
                 .andExpect(jsonPath("$.errorMessages", hasSize(1)))
-                .andExpect(jsonPath("$.errorMessages", hasItem("Visit can only be scheduled between 8 a.m and 8 p.m, visitTime=2022-05-10T01:00")))
-                .andExpect(jsonPath("$.exceptionTypeName").value("VisitTimeException"))
+                .andExpect(jsonPath("$.errorMessages", hasItem("Property: time; value: '2022-05-10T01:00'; message: Wrong visit time")))
+                .andExpect(jsonPath("$.exceptionTypeName").value("MethodArgumentNotValidException"))
+                .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
+    }
+
+
+    @Test
+    public void shouldResponseBadRequestCodeWhenTryAddVisitInPastTime() throws Exception {
+        CreateVisitCommand createVisitCommand = new CreateVisitCommand();
+        createVisitCommand.setDoctorIdentity(doctor2.getId());
+        createVisitCommand.setPatientIdentity(patient1.getId());
+        createVisitCommand.setTime(LocalDateTime.of(1992, 5, 10, 1, 0));
+        //when
+        mockMvc.perform(post("/visit")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createVisitCommand)))
+                //then
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorMessages").isArray())
+                .andExpect(jsonPath("$.errorMessages", hasSize(1)))
+                .andExpect(jsonPath("$.errorMessages", hasItem("Property: time; value: '1992-05-10T01:00'; message: Wrong visit time")))
+                .andExpect(jsonPath("$.exceptionTypeName").value("MethodArgumentNotValidException"))
                 .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
     }
 
