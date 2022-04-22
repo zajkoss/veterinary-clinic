@@ -9,9 +9,11 @@ import pl.kurs.veterinaryclinic.exception.NoEntityException;
 import pl.kurs.veterinaryclinic.model.Patient;
 import pl.kurs.veterinaryclinic.repository.PatientRepository;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class PatientService implements IPatientService {
 
     private PatientRepository repository;
