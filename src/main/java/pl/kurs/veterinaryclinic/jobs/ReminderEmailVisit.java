@@ -1,5 +1,6 @@
 package pl.kurs.veterinaryclinic.jobs;
 
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,8 @@ public class ReminderEmailVisit {
     }
 
 //    @Scheduled(fixedDelay = 2000)
-    @Scheduled(cron = "0 00 23 * * ?",zone="Europe/Warsaw")
+    @Scheduled(cron = "0 10 22 * * ?",zone="Europe/Warsaw")
+    @SchedulerLock(name = "ReminderEmailVisit_sendReminders", lockAtLeastFor = "PT5M", lockAtMostFor = "PT20M")
     public void sendReminders() {
         System.out.println("Send reminder");
         visitService.findAllVisitForNextDayWithoutSendReminder().forEach(visit -> {
