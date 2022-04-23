@@ -3,11 +3,8 @@ package pl.kurs.veterinaryclinic.dto;
 import pl.kurs.veterinaryclinic.model.enums.AnimalType;
 import pl.kurs.veterinaryclinic.model.enums.DoctorType;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import java.math.BigDecimal;
+import java.util.Objects;
 
 public class DoctorDto {
 
@@ -89,5 +86,33 @@ public class DoctorDto {
 
     public void setAnimalType(AnimalType animalType) {
         this.animalType = animalType;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DoctorDto doctorDto = (DoctorDto) o;
+        return Objects.equals(id, doctorDto.id) && Objects.equals(name, doctorDto.name) && Objects.equals(surname, doctorDto.surname) && Objects.equals(salary, doctorDto.salary) && Objects.equals(nip, doctorDto.nip) && Objects.equals(isActive, doctorDto.isActive) && type == doctorDto.type && animalType == doctorDto.animalType;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, surname, salary, nip, isActive, type, animalType);
+    }
+
+    @Override
+    public String toString() {
+        return "DoctorDto{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                ", salary=" + salary +
+                ", nip='" + nip + '\'' +
+                ", isActive=" + isActive +
+                ", type=" + type +
+                ", animalType=" + animalType +
+                '}';
     }
 }

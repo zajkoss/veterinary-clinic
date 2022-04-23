@@ -2,6 +2,7 @@ package pl.kurs.veterinaryclinic.commands;
 
 import pl.kurs.veterinaryclinic.model.enums.AnimalType;
 import pl.kurs.veterinaryclinic.model.enums.DoctorType;
+import pl.kurs.veterinaryclinic.validators.EnumsValidator;
 import pl.kurs.veterinaryclinic.validators.NIP;
 
 import javax.validation.constraints.NotBlank;
@@ -23,12 +24,11 @@ public class CreateDoctorCommand {
     @NIP
     private String nip;
 
-    @NotNull
-    private Boolean isActive;
+    @EnumsValidator(enumClass = DoctorType.class,message = "Invalid value for: type field")
+    private String type;
 
-    private DoctorType type;
-
-    private AnimalType animalType;
+    @EnumsValidator(enumClass = AnimalType.class,message = "Invalid value for: animalType field")
+    private String animalType;
 
     public String getName() {
         return name;
@@ -46,15 +46,35 @@ public class CreateDoctorCommand {
         return nip;
     }
 
-    public Boolean getIsActive() {
-        return isActive;
-    }
-
-    public DoctorType getType() {
+    public String  getType() {
         return type;
     }
 
-    public AnimalType getAnimalType() {
+    public String  getAnimalType() {
         return animalType;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public void setSalary(BigDecimal salary) {
+        this.salary = salary;
+    }
+
+    public void setNip(String nip) {
+        this.nip = nip;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setAnimalType(String animalType) {
+        this.animalType = animalType;
     }
 }
