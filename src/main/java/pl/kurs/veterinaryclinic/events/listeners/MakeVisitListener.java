@@ -1,6 +1,5 @@
 package pl.kurs.veterinaryclinic.events.listeners;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import pl.kurs.veterinaryclinic.events.OnMakeVisitEvent;
@@ -17,12 +16,14 @@ public class MakeVisitListener implements ApplicationListener<OnMakeVisitEvent> 
     private static final String confirmationUrlAddress = "/visit/confirm/";
     private static final String cancelUrlAddress = "/visit/cancel/";
 
-
-    @Autowired
     private IVisitService visitService;
 
-    @Autowired
     private EmailService emailService;
+
+    public MakeVisitListener(IVisitService visitService, EmailService emailService) {
+        this.visitService = visitService;
+        this.emailService = emailService;
+    }
 
     @Override
     public void onApplicationEvent(OnMakeVisitEvent event) {

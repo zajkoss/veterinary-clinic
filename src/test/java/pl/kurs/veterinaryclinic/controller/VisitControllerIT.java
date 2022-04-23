@@ -66,7 +66,7 @@ class VisitControllerIT {
     private Visit visit2;
     private Visit visit3;
     private Visit visit4;
-//TODO test na data wstecz
+
     @BeforeEach
     void setUp() {
         visitRepository.deleteAll();

@@ -32,6 +32,9 @@ public class Visit implements Serializable {
     @Column(nullable = false)
     private Boolean reminderSent = false;
 
+    @Version
+    private Integer version;
+
     public Visit() {
     }
 

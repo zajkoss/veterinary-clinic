@@ -9,7 +9,10 @@ import pl.kurs.veterinaryclinic.repository.VisitRepository;
 
 import javax.persistence.EntityNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -76,6 +79,19 @@ public class VisitService implements IVisitService {
     @Override
     public List<Visit> findAllVisitInTime(LocalDateTime fromTime, LocalDateTime toTime) {
         return repository.findAllByTimeAfterAndTimeBeforeOrderByTime(fromTime.minusSeconds(1), toTime);
+    }
+
+    @Override
+    public List<Visit> findAllVisitForNextDayWithoutSendReminder() {
+        LocalDateTime fromTime = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
+        LocalDateTime toTime = LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.MIN);
+        System.out.println(fromTime + " " + toTime);
+        return repository.findAllByTimeAfterAndTimeBeforeAndReminderSentFalse(fromTime,toTime);
+    }
+
+    @Override
+    public void setReminderOfVisit(Visit visit) {
+        repository.save(visit);
     }
 
     @Override

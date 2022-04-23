@@ -39,6 +39,9 @@ public class Patient implements Serializable {
     @Column(nullable = false)
     private String email;
 
+    @Version
+    private Integer version;
+
     public Patient() {
     }
 
