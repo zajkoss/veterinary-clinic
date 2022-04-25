@@ -91,30 +91,16 @@ public class VisitController {
     ) {
         DoctorType doctorType = type == null ? null : DoctorType.valueOf(type.toUpperCase());
         AnimalType animalType = animal == null ? null : AnimalType.valueOf(animal.toUpperCase());
-        List<Doctor> foundDoctors = doctorService.getAllForParameters(doctorType,animalType);
 
         if(fromTime == null) fromTime = LocalDateTime.now();
         if(toTime == null) toTime = fromTime.plusDays(2);
-        List<AvailableVisitDto> plannedVisit = visitService.findAllVisitInTime(fromTime, toTime).stream().map(this::mapVisitToAvailableVisitDto).collect(Collectors.toList());
 
-        List<AvailableVisitDto> result = new ArrayList<>();
-        LocalDateTime startTime = fromTime;
-        if(startTime.getMinute() != 0 || startTime.getSecond() != 0)
-            startTime = startTime.withMinute(0).withSecond(0).plusHours(1);
+        List<AvailableVisitDto> availableVisit = visitService.findAllAvailableVisitInTimeByDoctorTypeAndAnimal(fromTime,toTime,doctorType,animalType)
+                .stream()
+                .map(this::mapVisitToAvailableVisitDto)
+                .collect(Collectors.toList());
 
-        while (startTime.isBefore(toTime)) {
-            LocalDateTime finalStartTime = startTime;
-            if(finalStartTime.getHour() >= 8 && finalStartTime.getHour() <= 20) {
-                result.addAll(
-                        foundDoctors.stream()
-                                .map(doctor -> mapDoctorToAvailableVisitDto(doctor, finalStartTime))
-                                .filter(availableVisitDto -> !plannedVisit.contains(availableVisitDto))
-                                .collect(Collectors.toList())
-                );
-            }
-            startTime = startTime.plusHours(1);
-        }
-        return ResponseEntity.ok().body(result.stream().limit(10).collect(Collectors.toList()));
+        return ResponseEntity.ok().body(availableVisit.stream().limit(10).collect(Collectors.toList()));
 
     }
 
@@ -122,13 +108,6 @@ public class VisitController {
         return new AvailableVisitDto(
                 new DoctorNameDto(visit.getDoctor().getId(), visit.getDoctor().getName() + " " + visit.getDoctor().getSurname()),
                 visit.getTime()
-        );
-    }
-
-    private AvailableVisitDto mapDoctorToAvailableVisitDto(Doctor doctor, LocalDateTime hour) {
-        return new AvailableVisitDto(
-                new DoctorNameDto(doctor.getId(), doctor.getName() + " " + doctor.getSurname()),
-                hour
         );
     }
 }

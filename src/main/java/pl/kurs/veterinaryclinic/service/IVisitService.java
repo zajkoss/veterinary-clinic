@@ -2,6 +2,8 @@ package pl.kurs.veterinaryclinic.service;
 
 import pl.kurs.veterinaryclinic.model.ConfirmationToken;
 import pl.kurs.veterinaryclinic.model.Visit;
+import pl.kurs.veterinaryclinic.model.enums.AnimalType;
+import pl.kurs.veterinaryclinic.model.enums.DoctorType;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,6 +17,12 @@ public interface IVisitService {
     List<Visit> findAllVisitInTime(
             LocalDateTime fromTime,
             LocalDateTime toTime
+    );
+    List<Visit> findAllAvailableVisitInTimeByDoctorTypeAndAnimal(
+            LocalDateTime fromTime,
+            LocalDateTime toTime,
+            DoctorType doctorType,
+            AnimalType animalType
     );
     List<Visit> findAllVisitForNextDayWithoutSendReminder();
     void setReminderOfVisit(Visit visit);
