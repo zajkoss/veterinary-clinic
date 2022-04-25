@@ -3,10 +3,9 @@ package pl.kurs.veterinaryclinic.commands;
 import pl.kurs.veterinaryclinic.model.enums.AnimalType;
 import pl.kurs.veterinaryclinic.model.enums.DoctorType;
 import pl.kurs.veterinaryclinic.validators.EnumsValidator;
-import pl.kurs.veterinaryclinic.validators.NIP;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
 
@@ -21,7 +20,7 @@ public class CreateDoctorCommand {
     @Positive
     private BigDecimal salary;
 
-    @NIP
+    @Pattern(regexp = "\\d{10}",message = "{nip.message}")
     private String nip;
 
     @EnumsValidator(enumClass = DoctorType.class,message = "Invalid value for: type field")
