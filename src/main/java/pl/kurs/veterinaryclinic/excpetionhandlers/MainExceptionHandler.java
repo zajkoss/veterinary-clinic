@@ -2,6 +2,7 @@ package pl.kurs.veterinaryclinic.excpetionhandlers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -25,8 +26,14 @@ public class MainExceptionHandler {
 
     @ExceptionHandler({MethodArgumentNotValidException.class})
     public ResponseEntity<ExceptionResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
+
         List<String> messages = ex.getFieldErrors().stream()
                 .map(e -> "Property: " + e.getField() + "; value: '" + e.getRejectedValue() + "'; message: " + e.getDefaultMessage()).collect(Collectors.toList());
+        messages.addAll(
+                ex.getAllErrors().stream()
+                        .filter(objectError -> !(objectError instanceof FieldError))
+                        .map(objectError -> "Property: " + objectError.getObjectName() + "'; message: " + objectError.getDefaultMessage()).collect(Collectors.toList())
+        );
         ExceptionResponse response = new ExceptionResponse(messages, ex.getClass().getSimpleName(), "BAD_REQUEST", LocalDateTime.now());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
@@ -39,14 +46,14 @@ public class MainExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({DuplicatedValueEntityException.class, VisitTimeException.class, WrongVisitStatusException.class,NotFoundRelationException.class,VisitMemberException.class})
+    @ExceptionHandler({DuplicatedValueEntityException.class, VisitTimeException.class, WrongVisitStatusException.class, NotFoundRelationException.class, VisitMemberException.class})
     public ResponseEntity<ExceptionResponse> handleEntityNotFoundException(RuntimeException ex) {
         ExceptionResponse response = new ExceptionResponse(List.of(ex.getMessage()), ex.getClass().getSimpleName(), "BAD_REQUEST", LocalDateTime.now());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({MethodArgumentTypeMismatchException .class})
-    public ResponseEntity<ExceptionResponse> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException  ex) {
+    @ExceptionHandler({MethodArgumentTypeMismatchException.class})
+    public ResponseEntity<ExceptionResponse> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
         ExceptionResponse response = new ExceptionResponse(List.of("Method argument mismatch field: " + ex.getName()), ex.getClass().getSimpleName(), "BAD_REQUEST", LocalDateTime.now());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
