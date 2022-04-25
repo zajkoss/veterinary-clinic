@@ -23,6 +23,7 @@ import pl.kurs.veterinaryclinic.repository.PatientRepository;
 import pl.kurs.veterinaryclinic.repository.VisitRepository;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
