@@ -52,7 +52,7 @@ public class DoctorController {
 
         return ResponseEntity.ok(
                 mapper.map(doctorService.get(id).orElseThrow(
-                        () -> new EntityNotFoundException("" + id)
+                        () -> new EntityNotFoundException(Long.toString(id))
                 ), DoctorDto.class)
         );
     }
@@ -66,7 +66,7 @@ public class DoctorController {
     @PutMapping("/fire/{id}")
     public ResponseEntity<StatusDto> softDeleteDoctor(@PathVariable("id") long id) {
         doctorService.softDelete(id);
-        return ResponseEntity.ok().body(new StatusDto("" + id));
+        return ResponseEntity.ok().body(new StatusDto(Long.toString(id)));
     }
 
 

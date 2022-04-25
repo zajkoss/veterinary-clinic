@@ -62,7 +62,7 @@ public class DoctorService implements IDoctorService {
     public void softDelete(Long id) {
         Doctor loadedDoctor = repository
                 .findById(Optional.ofNullable(id).orElseThrow(() -> new EmptyIdException(id)))
-                .orElseThrow(() -> new EntityNotFoundException("" + id));
+                .orElseThrow(() -> new EntityNotFoundException(id.toString()));
         loadedDoctor.setIsActive(false);
         repository.save(loadedDoctor);
     }

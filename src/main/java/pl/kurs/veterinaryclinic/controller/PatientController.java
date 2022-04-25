@@ -51,7 +51,7 @@ public class PatientController {
     public ResponseEntity<PatientDto> getPatientById(@PathVariable("id") long id) {
         return ResponseEntity.ok(
                 mapper.map(patientService.get(id).orElseThrow(
-                        () -> new EntityNotFoundException("" + id)
+                        () -> new EntityNotFoundException(Long.toString(id))
                 ), PatientDto.class)
         );
     }
