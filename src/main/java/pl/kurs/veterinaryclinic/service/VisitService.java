@@ -30,7 +30,6 @@ public class VisitService implements IVisitService {
 
     private VisitRepository repository;
 
-    private IPatientService patientService;
     private IDoctorService doctorService;
 
     private ConfirmationTokenRepository confirmationTokenRepository;
@@ -47,12 +46,6 @@ public class VisitService implements IVisitService {
             throw new NoEntityException();
         if (visit.getId() != null)
             throw new NoEmptyIdException(visit.getId());
-
-        if (repository.findByDoctorIdAndTime(visit.getDoctor().getId(), visit.getTime()).isPresent())
-            throw new VisitMemberException("Doctor already has visit that date");
-
-        if (repository.findByPatientIdAndTime(visit.getPatient().getId(), visit.getTime()).isPresent())
-            throw new VisitMemberException("Patient already has visit that date");
 
         return repository.save(visit);
     }
