@@ -9,4 +9,5 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
 
     Optional<Doctor> findDoctorByNipEquals(String nipNumber);
     Optional<Doctor> findDoctorByIdAndIsActiveTrue(Long id);
+    boolean existsByNip(String nipNumber);
 }
