@@ -6,9 +6,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.kurs.veterinaryclinic.commands.CreateVisitCommand;
+import pl.kurs.veterinaryclinic.commands.QueryAvailableVisitCommand;
 import pl.kurs.veterinaryclinic.dto.*;
 import pl.kurs.veterinaryclinic.events.OnMakeVisitEvent;
 import pl.kurs.veterinaryclinic.exception.NotFoundRelationException;
@@ -82,20 +84,21 @@ public class VisitController {
         return ResponseEntity.ok().body(new ConfirmRequestWithMessageDto("Visit canceled"));
     }
 
+
+
     @PostMapping("/check")
     public ResponseEntity<List<AvailableVisitDto>> checkNearestVisit(
-            @RequestParam(required = false, name = "type") @EnumsValidator(enumClass = DoctorType.class,message = "Invalid value for: type") String type,
-            @RequestParam(required = false, name = "animal") @EnumsValidator(enumClass = AnimalType.class,message = "Invalid value for: animal") String animal,
-            @RequestParam(required = false, name = "from")  LocalDateTime fromTime,
-            @RequestParam(required = false, name = "to")  LocalDateTime toTime
+            @ModelAttribute @Valid QueryAvailableVisitCommand queryAvailableVisitCommand, BindingResult bindingResult
     ) {
-        DoctorType doctorType = type == null ? null : DoctorType.valueOf(type.toUpperCase());
-        AnimalType animalType = animal == null ? null : AnimalType.valueOf(animal.toUpperCase());
+        DoctorType doctorType = queryAvailableVisitCommand.getType() == null ? null : DoctorType.valueOf(queryAvailableVisitCommand.getType().toUpperCase());
+        AnimalType animalType = queryAvailableVisitCommand.getAnimal() == null ? null : AnimalType.valueOf(queryAvailableVisitCommand.getAnimal().toUpperCase());
 
-        if(fromTime == null) fromTime = LocalDateTime.now();
-        if(toTime == null) toTime = fromTime.plusDays(2);
+        if(queryAvailableVisitCommand.getFrom() == null)
+            queryAvailableVisitCommand.setFrom(LocalDateTime.now());
+        if(queryAvailableVisitCommand.getTo() == null)
+            queryAvailableVisitCommand.setTo(queryAvailableVisitCommand.getFrom().plusDays(2));
 
-        List<AvailableVisitDto> availableVisit = visitService.findAllAvailableVisitInTimeByDoctorTypeAndAnimal(fromTime,toTime,doctorType,animalType)
+        List<AvailableVisitDto> availableVisit = visitService.findAllAvailableVisitInTimeByDoctorTypeAndAnimal(queryAvailableVisitCommand.getFrom(),queryAvailableVisitCommand.getTo(),doctorType,animalType)
                 .stream()
                 .map(this::mapVisitToAvailableVisitDto)
                 .collect(Collectors.toList());
