@@ -6,7 +6,9 @@ import pl.kurs.veterinaryclinic.model.enums.DoctorType;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "doctors")
@@ -37,12 +39,15 @@ public class Doctor implements Serializable {
 
     private AnimalType animalType;
 
+    @OneToMany(mappedBy = "doctor", fetch = FetchType.LAZY)
+    private Set<Visit> visits = new HashSet<>();
+
     @Version
     private Integer version;
 
     public Doctor() {}
 
-    public Doctor(String name, String surname, BigDecimal salary, String nip, Boolean isActive, DoctorType type, AnimalType animalType) {
+    public Doctor(String name, String surname, BigDecimal salary, String nip, Boolean isActive, DoctorType type, AnimalType animalType, Set<Visit> visits) {
         this.name = name;
         this.surname = surname;
         this.salary = salary;
@@ -50,7 +55,9 @@ public class Doctor implements Serializable {
         this.isActive = isActive;
         this.type = type;
         this.animalType = animalType;
+        this.visits = visits;
     }
+
 
     public Long getId() {
         return id;
@@ -116,17 +123,25 @@ public class Doctor implements Serializable {
         this.animalType = animalType;
     }
 
+    public Set<Visit> getVisits() {
+        return visits;
+    }
+
+    public void setVisits(Set<Visit> visits) {
+        this.visits = visits;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Doctor doctor = (Doctor) o;
-        return Objects.equals(id, doctor.id) && Objects.equals(name, doctor.name) && Objects.equals(surname, doctor.surname) && Objects.equals(salary, doctor.salary) && Objects.equals(nip, doctor.nip) && Objects.equals(isActive, doctor.isActive) && type == doctor.type && animalType == doctor.animalType;
+        return Objects.equals(id, doctor.id) && Objects.equals(name, doctor.name) && Objects.equals(surname, doctor.surname) && Objects.equals(salary, doctor.salary) && Objects.equals(nip, doctor.nip) && Objects.equals(isActive, doctor.isActive) && type == doctor.type && animalType == doctor.animalType && Objects.equals(visits, doctor.visits);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, surname, salary, nip, isActive, type, animalType);
+        return Objects.hash(id, name, surname, salary, nip, isActive, type, animalType, visits);
     }
 
     @Override
@@ -140,6 +155,7 @@ public class Doctor implements Serializable {
                 ", isActive=" + isActive +
                 ", type=" + type +
                 ", animalType=" + animalType +
+                ", visits=" + visits +
                 '}';
     }
 }
