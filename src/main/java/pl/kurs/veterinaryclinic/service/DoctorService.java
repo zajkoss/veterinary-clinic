@@ -4,7 +4,6 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import pl.kurs.veterinaryclinic.exception.DuplicatedValueEntityException;
 import pl.kurs.veterinaryclinic.exception.EmptyIdException;
 import pl.kurs.veterinaryclinic.exception.NoEmptyIdException;
 import pl.kurs.veterinaryclinic.exception.NoEntityException;
@@ -34,10 +33,6 @@ public class DoctorService implements IDoctorService {
             throw new NoEntityException();
         if (doctor.getId() != null)
             throw new NoEmptyIdException(doctor.getId());
-
-        if (repository.findDoctorByNipEquals(doctor.getNip()).isPresent())
-            throw new DuplicatedValueEntityException("nip", doctor.getNip());
-
         doctor.setIsActive(true);
         return repository.save(doctor);
     }

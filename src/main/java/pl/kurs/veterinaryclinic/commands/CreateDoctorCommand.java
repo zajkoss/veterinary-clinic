@@ -1,13 +1,17 @@
 package pl.kurs.veterinaryclinic.commands;
 
+import org.springframework.beans.factory.annotation.Value;
 import pl.kurs.veterinaryclinic.model.enums.AnimalType;
 import pl.kurs.veterinaryclinic.model.enums.DoctorType;
+import pl.kurs.veterinaryclinic.validators.DoctorPatientAvailable;
 import pl.kurs.veterinaryclinic.validators.EnumsValidator;
+import pl.kurs.veterinaryclinic.validators.UniqueNIPNumber;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
+
 
 public class CreateDoctorCommand {
 
@@ -21,6 +25,7 @@ public class CreateDoctorCommand {
     private BigDecimal salary;
 
     @Pattern(regexp = "\\d{10}",message = "{nip.message}")
+    @UniqueNIPNumber
     private String nip;
 
     @EnumsValidator(enumClass = DoctorType.class,message = "Invalid value for: type field")
