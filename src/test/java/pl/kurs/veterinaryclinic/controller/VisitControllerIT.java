@@ -25,6 +25,7 @@ import pl.kurs.veterinaryclinic.repository.VisitRepository;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -73,12 +74,12 @@ class VisitControllerIT {
         visitRepository.deleteAll();
         doctorRepository.deleteAll();
         patientRepository.deleteAll();
-        doctor1 = doctorRepository.save(new Doctor("Tomasz", "Kubica", new BigDecimal("30.0"), "1234567893", true, DoctorType.EYE_DOCTOR, AnimalType.DOG));
-        doctor2 = doctorRepository.save(new Doctor("Katarzyna", "Lewandowska", new BigDecimal("56.0"), "1234567894", true, DoctorType.DENTIST, AnimalType.HORSE));
-        doctor3 = doctorRepository.save(new Doctor("Robert", "Kubica", new BigDecimal("30.0"), "1234767893", true, DoctorType.EYE_DOCTOR, AnimalType.HORSE));
-        doctor4 = doctorRepository.save(new Doctor("Robert", "Lewandowski", new BigDecimal("56.0"), "1239567894", true, DoctorType.DENTIST, AnimalType.DOG));
-        patient1 = patientRepository.save(new Patient("Szarik", "Pies", "Owczarek", 1, "Tomasz", "Paluch", "lukz1184@gmail.com"));
-        patient2 = patientRepository.save(new Patient("Filemon", "Kot", "Dachowiec", 5, "Dorota", "Mieszko", "lukz1184@gmail.com"));
+        doctor1 = doctorRepository.save(new Doctor("Tomasz", "Kubica", new BigDecimal("30.0"), "1234567893", true, DoctorType.EYE_DOCTOR, AnimalType.DOG,new HashSet<>()));
+        doctor2 = doctorRepository.save(new Doctor("Katarzyna", "Lewandowska", new BigDecimal("56.0"), "1234567894", true, DoctorType.DENTIST, AnimalType.HORSE,new HashSet<>()));
+        doctor3 = doctorRepository.save(new Doctor("Robert", "Kubica", new BigDecimal("30.0"), "1234767893", true, DoctorType.EYE_DOCTOR, AnimalType.HORSE,new HashSet<>()));
+        doctor4 = doctorRepository.save(new Doctor("Robert", "Lewandowski", new BigDecimal("56.0"), "1239567894", true, DoctorType.DENTIST, AnimalType.DOG,new HashSet<>()));
+        patient1 = patientRepository.save(new Patient("Szarik", "Pies", "Owczarek", 1, "Tomasz", "Paluch", "lukz1184@gmail.com",new HashSet<>()));
+        patient2 = patientRepository.save(new Patient("Filemon", "Kot", "Dachowiec", 5, "Dorota", "Mieszko", "lukz1184@gmail.com",new HashSet<>()));
         visit1 = visitRepository.save(new Visit(doctor1, patient1, LocalDateTime.of(2022, 5, 10, 10, 0)));
         visit2 = visitRepository.save(new Visit(doctor1, patient2, LocalDateTime.of(2022, 5, 10, 11, 0)));
         visit3 = visitRepository.save(new Visit(doctor2, patient1, LocalDateTime.of(2022, 5, 10, 12, 0)));
@@ -199,7 +200,7 @@ class VisitControllerIT {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorMessages").isArray())
                 .andExpect(jsonPath("$.errorMessages", hasSize(1)))
-                .andExpect(jsonPath("$.errorMessages", hasItem("Property: checkNearestVisit.type; value: 'eyedoctor'; message: Invalid value for: type")))
+                .andExpect(jsonPath("$.errorMessages", hasItem("Property: checkNearestVisit.queryAvailableVisitCommand.type; value: 'eyedoctor'; message: Invalid value for: type")))
                 .andExpect(jsonPath("$.exceptionTypeName").value("ConstraintViolationException"))
                 .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
     }
@@ -214,52 +215,8 @@ class VisitControllerIT {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorMessages").isArray())
                 .andExpect(jsonPath("$.errorMessages", hasSize(1)))
-                .andExpect(jsonPath("$.errorMessages", hasItem("Property: checkNearestVisit.animal; value: 'dogs'; message: Invalid value for: animal")))
+                .andExpect(jsonPath("$.errorMessages", hasItem("Property: checkNearestVisit.queryAvailableVisitCommand.animal; value: 'dogs'; message: Invalid value for: animal")))
                 .andExpect(jsonPath("$.exceptionTypeName").value("ConstraintViolationException"))
-                .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
-    }
-
-
-    @Test
-    public void shouldResponseBadRequestCodeWhenTryCheckVisitsWithIncorrectFromDate() throws Exception {
-        //when
-        mockMvc.perform(post("/visit/check")
-                        .param("from", "202205-10 08:00:00"))
-                //then
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errorMessages").isArray())
-                .andExpect(jsonPath("$.errorMessages", hasSize(1)))
-                .andExpect(jsonPath("$.errorMessages", hasItem("Method argument mismatch field: from")))
-                .andExpect(jsonPath("$.exceptionTypeName").value("MethodArgumentTypeMismatchException"))
-                .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
-    }
-
-    @Test
-    public void shouldResponseBadRequestCodeWhenTryCheckVisitsWithIncorrectToDate() throws Exception {
-        //when
-        mockMvc.perform(post("/visit/check")
-                        .param("to", "202205-10 08:00:00"))
-                //then
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errorMessages").isArray())
-                .andExpect(jsonPath("$.errorMessages", hasSize(1)))
-                .andExpect(jsonPath("$.errorMessages", hasItem("Method argument mismatch field: to")))
-                .andExpect(jsonPath("$.exceptionTypeName").value("MethodArgumentTypeMismatchException"))
-                .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
-    }
-
-
-    @Test
-    public void shouldResponseBadRequestCodeWhenTryAddVisitWithout() throws Exception {
-        //when
-        mockMvc.perform(post("/visit/check")
-                        .param("to", "202205-10 08:00:00"))
-                //then
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errorMessages").isArray())
-                .andExpect(jsonPath("$.errorMessages", hasSize(1)))
-                .andExpect(jsonPath("$.errorMessages", hasItem("Method argument mismatch field: to")))
-                .andExpect(jsonPath("$.exceptionTypeName").value("MethodArgumentTypeMismatchException"))
                 .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
     }
 
@@ -374,8 +331,8 @@ class VisitControllerIT {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorMessages").isArray())
                 .andExpect(jsonPath("$.errorMessages", hasSize(1)))
-                .andExpect(jsonPath("$.errorMessages", hasItem("Doctor already has visit that date")))
-                .andExpect(jsonPath("$.exceptionTypeName").value("VisitMemberException"))
+                .andExpect(jsonPath("$.errorMessages", hasItem("Property: createVisitCommand'; message: Doctor/Patient already has visit that date")))
+                .andExpect(jsonPath("$.exceptionTypeName").value("MethodArgumentNotValidException"))
                 .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
     }
 
@@ -394,8 +351,8 @@ class VisitControllerIT {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorMessages").isArray())
                 .andExpect(jsonPath("$.errorMessages", hasSize(1)))
-                .andExpect(jsonPath("$.errorMessages", hasItem("Patient already has visit that date")))
-                .andExpect(jsonPath("$.exceptionTypeName").value("VisitMemberException"))
+                .andExpect(jsonPath("$.errorMessages", hasItem("Property: createVisitCommand'; message: Doctor/Patient already has visit that date")))
+                .andExpect(jsonPath("$.exceptionTypeName").value("MethodArgumentNotValidException"))
                 .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
     }
 
@@ -457,6 +414,49 @@ class VisitControllerIT {
                 .andExpect(jsonPath("$.errorMessages", hasItem("Property: time; value: '1992-05-10T01:00'; message: Wrong visit time")))
                 .andExpect(jsonPath("$.exceptionTypeName").value("MethodArgumentNotValidException"))
                 .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
+    }
+
+    @Test
+    public void pes() throws Exception {
+        CreateVisitCommand createVisitCommand = new CreateVisitCommand();
+        createVisitCommand.setDoctorIdentity(doctor2.getId());
+        createVisitCommand.setPatientIdentity(patient1.getId());
+        createVisitCommand.setTime(LocalDateTime.of(2022, 6, 10, 11, 0));
+
+        CreateVisitCommand createVisitCommand2 = new CreateVisitCommand();
+        createVisitCommand.setDoctorIdentity(doctor2.getId());
+        createVisitCommand.setPatientIdentity(patient2.getId());
+        createVisitCommand.setTime(LocalDateTime.of(2022, 6, 10, 11, 0));
+
+        Runnable runnable1 = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    mockMvc.perform(post("/visit")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(createVisitCommand)))
+                            .andExpect(status().isOk());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        Runnable runnable2 = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    mockMvc.perform(post("/visit")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(createVisitCommand2)))
+                            .andExpect(status().isOk());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        runnable1.run();
+        runnable2.run();
     }
 
 

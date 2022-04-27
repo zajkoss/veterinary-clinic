@@ -19,6 +19,7 @@ import pl.kurs.veterinaryclinic.repository.DoctorRepository;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasItem;
@@ -48,7 +49,7 @@ class DoctorControllerIT {
     @Test
     public void shouldGetSingleDoctor() throws Exception {
         //given -
-        Doctor doctorAdam = doctorRepository.save(new Doctor("Adam", "Janko", new BigDecimal("110.00"), "1114567891", true, DoctorType.CARDIOLOGIST, AnimalType.DOG));
+        Doctor doctorAdam = doctorRepository.save(new Doctor("Adam", "Janko", new BigDecimal("110.00"), "1114567891", true, DoctorType.CARDIOLOGIST, AnimalType.DOG,new HashSet<>()));
         //when
         String responseJson = mockMvc.perform(get("/doctor/" + doctorAdam.getId()))
                 .andExpect(status().isOk())
@@ -76,7 +77,7 @@ class DoctorControllerIT {
     @Test
     public void shouldAddNewDoctor() throws Exception {
         //given
-        Doctor doctor = new Doctor("Jan", "Kowalski", new BigDecimal("100.00"), "1234597890", true, DoctorType.EYE_DOCTOR, AnimalType.CAT);
+        Doctor doctor = new Doctor("Jan", "Kowalski", new BigDecimal("100.00"), "1234597890", true, DoctorType.EYE_DOCTOR, AnimalType.CAT,new HashSet<>());
         DoctorDto doctorDto = modelMapper.map(doctor, DoctorDto.class);
         String createDoctorCommandJson = objectMapper.writeValueAsString(modelMapper.map(doctor, CreateDoctorCommand.class));
         //when
@@ -103,7 +104,7 @@ class DoctorControllerIT {
     @Test
     public void shouldResponseBadRequestCodeWhenTryAddNewDoctorWithoutNameAndSurname() throws Exception {
         //given
-        Doctor doctor = new Doctor("", "", new BigDecimal("100.00"), "9234567890", true, DoctorType.EYE_DOCTOR, AnimalType.CAT);
+        Doctor doctor = new Doctor("", "", new BigDecimal("100.00"), "9994567890", true, DoctorType.EYE_DOCTOR, AnimalType.CAT,new HashSet<>());
         String createDoctorCommandJson = objectMapper.writeValueAsString(modelMapper.map(doctor, CreateDoctorCommand.class));
         //when
         mockMvc.perform(post("/doctor")
@@ -122,7 +123,7 @@ class DoctorControllerIT {
     @Test
     public void shouldResponseBadRequestCodeWhenTryAddNewDoctorWithoutNegativeSalary() throws Exception {
         //given
-        Doctor doctor = new Doctor("Jan", "Kowalski", new BigDecimal("-10.00"), "9234567890", true, DoctorType.EYE_DOCTOR, AnimalType.CAT);
+        Doctor doctor = new Doctor("Jan", "Kowalski", new BigDecimal("-10.00"), "9234517890", true, DoctorType.EYE_DOCTOR, AnimalType.CAT,new HashSet<>());
         String createDoctorCommandJson = objectMapper.writeValueAsString(modelMapper.map(doctor, CreateDoctorCommand.class));
         //when
         mockMvc.perform(post("/doctor")
@@ -140,7 +141,7 @@ class DoctorControllerIT {
     @Test
     public void shouldResponseBadRequestCodeWhenTryAddNewDoctorWithNipNumberLessThan10() throws Exception {
         //given
-        Doctor doctor = new Doctor("Jan", "Kowalski", new BigDecimal("10.00"), "923456789", true, DoctorType.EYE_DOCTOR, AnimalType.CAT);
+        Doctor doctor = new Doctor("Jan", "Kowalski", new BigDecimal("10.00"), "923456789", true, DoctorType.EYE_DOCTOR, AnimalType.CAT,new HashSet<>());
         String createDoctorCommandJson = objectMapper.writeValueAsString(modelMapper.map(doctor, CreateDoctorCommand.class));
         //when
         mockMvc.perform(post("/doctor")
@@ -150,7 +151,7 @@ class DoctorControllerIT {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorMessages").isArray())
                 .andExpect(jsonPath("$.errorMessages", hasSize(1)))
-                .andExpect(jsonPath("$.errorMessages", hasItem("Property: nip; value: '923456789'; message: Wrong NIP number")))
+                .andExpect(jsonPath("$.errorMessages", hasItem("Property: nip; value: '923456789'; message: Wrong NIP number format")))
                 .andExpect(jsonPath("$.exceptionTypeName").value("MethodArgumentNotValidException"))
                 .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
     }
@@ -158,7 +159,7 @@ class DoctorControllerIT {
     @Test
     public void shouldResponseBadRequestCodeWhenTryAddNewDoctorWithNipNumberMoreThan10() throws Exception {
         //given
-        Doctor doctor = new Doctor("Jan", "Kowalski", new BigDecimal("10.00"), "92345678901", true, DoctorType.EYE_DOCTOR, AnimalType.CAT);
+        Doctor doctor = new Doctor("Jan", "Kowalski", new BigDecimal("10.00"), "92345678901", true, DoctorType.EYE_DOCTOR, AnimalType.CAT,new HashSet<>());
         String createDoctorCommandJson = objectMapper.writeValueAsString(modelMapper.map(doctor, CreateDoctorCommand.class));
         //when
         mockMvc.perform(post("/doctor")
@@ -168,17 +169,17 @@ class DoctorControllerIT {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorMessages").isArray())
                 .andExpect(jsonPath("$.errorMessages", hasSize(1)))
-                .andExpect(jsonPath("$.errorMessages", hasItem("Property: nip; value: '92345678901'; message: Wrong NIP number")))
+                .andExpect(jsonPath("$.errorMessages", hasItem("Property: nip; value: '92345678901'; message: Wrong NIP number format")))
                 .andExpect(jsonPath("$.exceptionTypeName").value("MethodArgumentNotValidException"))
                 .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
     }
 
     @Test
     public void shouldResponseBadRequestCodeWhenTryAddNewDoctorWithDuplicatedNipNumber() throws Exception {
-        Doctor doctor1 = new Doctor("Jan", "Kowalski", new BigDecimal("10.00"), "9234567890", true, DoctorType.EYE_DOCTOR, AnimalType.CAT);
+        Doctor doctor1 = new Doctor("Jan", "Kowalski", new BigDecimal("10.00"), "9234567890", true, DoctorType.EYE_DOCTOR, AnimalType.CAT,new HashSet<>());
         doctorRepository.save(doctor1);
         //given
-        Doctor doctor = new Doctor("Jan", "Kowalski", new BigDecimal("10.00"), "9234567890", true, DoctorType.EYE_DOCTOR, AnimalType.CAT);
+        Doctor doctor = new Doctor("Jan", "Kowalski", new BigDecimal("10.00"), "9234567890", true, DoctorType.EYE_DOCTOR, AnimalType.CAT,new HashSet<>());
         String createDoctorCommandJson = objectMapper.writeValueAsString(modelMapper.map(doctor, CreateDoctorCommand.class));
         //when
         mockMvc.perform(post("/doctor")
@@ -188,15 +189,15 @@ class DoctorControllerIT {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorMessages").isArray())
                 .andExpect(jsonPath("$.errorMessages", hasSize(1)))
-                .andExpect(jsonPath("$.errorMessages", hasItem("Duplicated value: 9234567890, field: nip")))
-                .andExpect(jsonPath("$.exceptionTypeName").value("DuplicatedValueEntityException"))
+                .andExpect(jsonPath("$.errorMessages", hasItem("Property: nip; value: '9234567890'; message: NIP number not unique")))
+                .andExpect(jsonPath("$.exceptionTypeName").value("MethodArgumentNotValidException"))
                 .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
     }
 
     @Test
     public void shouldResponseBadRequestCodeWhenTryAddNewDoctorWithIncorrectDoctorTypeAndIncorrectAnimalType() throws Exception {
         //given
-        Doctor doctor = new Doctor("Jan", "Kowalski", new BigDecimal("10.00"), "3234567890", true, DoctorType.EYE_DOCTOR, AnimalType.CAT);
+        Doctor doctor = new Doctor("Jan", "Kowalski", new BigDecimal("10.00"), "3234567890", true, DoctorType.EYE_DOCTOR, AnimalType.CAT,new HashSet<>());
         CreateDoctorCommand createDoctorCommand = modelMapper.map(doctor, CreateDoctorCommand.class);
         createDoctorCommand.setType("ORTOPEDA");
         createDoctorCommand.setAnimalType("HIPOPOTAM");
@@ -220,12 +221,12 @@ class DoctorControllerIT {
     public void shouldFindFirstFiveDoctorsOrderAscendingById() throws Exception {
         //given
         List<Doctor> doctors = Arrays.asList(
-                new Doctor("Katarzyna", "Lewandowska", new BigDecimal("56.00"), "1234567894", true, DoctorType.DENTIST, AnimalType.HORSE),
-                new Doctor("Anna", "Kowalczyk", new BigDecimal("44.00"), "1334567895", true, DoctorType.SURGEON, AnimalType.DOG),
-                new Doctor("Anna", "Kowalczyk", new BigDecimal("44.00"), "1434567895", true, DoctorType.SURGEON, AnimalType.DOG),
-                new Doctor("Anna", "Kowalczyk", new BigDecimal("44.00"), "1534567895", true, DoctorType.SURGEON, AnimalType.DOG),
-                new Doctor("Anna", "Kowalczyk", new BigDecimal("44.00"), "1634567895", true, DoctorType.SURGEON, AnimalType.DOG),
-                new Doctor("Anna", "Kowalczyk", new BigDecimal("44.00"), "1734567895", true, DoctorType.SURGEON, AnimalType.DOG)
+                new Doctor("Katarzyna", "Lewandowska", new BigDecimal("56.00"), "2234567894", true, DoctorType.DENTIST, AnimalType.HORSE,new HashSet<>()),
+                new Doctor("Anna", "Kowalczyk", new BigDecimal("44.00"), "2334567895", true, DoctorType.SURGEON, AnimalType.DOG,new HashSet<>()),
+                new Doctor("Anna", "Kowalczyk", new BigDecimal("44.00"), "2434567895", true, DoctorType.SURGEON, AnimalType.DOG,new HashSet<>()),
+                new Doctor("Anna", "Kowalczyk", new BigDecimal("44.00"), "2534567895", true, DoctorType.SURGEON, AnimalType.DOG,new HashSet<>()),
+                new Doctor("Anna", "Kowalczyk", new BigDecimal("44.00"), "2634567895", true, DoctorType.SURGEON, AnimalType.DOG,new HashSet<>()),
+                new Doctor("Anna", "Kowalczyk", new BigDecimal("44.00"), "2734567895", true, DoctorType.SURGEON, AnimalType.DOG,new HashSet<>())
         );
         doctorRepository.saveAll(doctors);
 
@@ -249,7 +250,7 @@ class DoctorControllerIT {
     @Test
     public void shouldSoftDeleteDoctor() throws Exception {
         //given
-        Doctor doctor = doctorRepository.save(new Doctor("Tomasz", "Kubica", new BigDecimal("30.00"), "1234567893", true, DoctorType.EYE_DOCTOR, AnimalType.DOG));
+        Doctor doctor = doctorRepository.save(new Doctor("Tomasz", "Kubica", new BigDecimal("30.00"), "1234561193", true, DoctorType.EYE_DOCTOR, AnimalType.DOG,new HashSet<>()));
 
         //when
         mockMvc.perform(put("/doctor/fire/" + doctor.getId()))
