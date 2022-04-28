@@ -1,5 +1,6 @@
 package pl.kurs.veterinaryclinic.validators;
 
+import org.springframework.transaction.annotation.Transactional;
 import pl.kurs.veterinaryclinic.commands.CreateDoctorCommand;
 import pl.kurs.veterinaryclinic.commands.CreateVisitCommand;
 import pl.kurs.veterinaryclinic.repository.VisitRepository;
@@ -21,6 +22,7 @@ public class DoctorPatientAvailableValidator implements ConstraintValidator<Doct
     }
 
     @Override
+    @Transactional
     public boolean isValid(CreateVisitCommand createVisitCommand, ConstraintValidatorContext constraintValidatorContext) {
         if (repository.findByDoctorIdAndTime(createVisitCommand.getDoctorIdentity(), createVisitCommand.getTime()).isPresent())
             return false;
