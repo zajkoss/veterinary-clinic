@@ -331,7 +331,6 @@ class DoctorControllerIT {
 
     }
 
-    @Transactional
     public void makeSoftDeleteOnDoctorById(Long id) throws InterruptedException {
         doctorService.softDelete(id);
     }
