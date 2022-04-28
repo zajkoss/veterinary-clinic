@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <changeSet author="lukasz" id="5">
+        <createTable tableName="confirmation_tokens">
+            <column autoIncrement="true" name="id_token" type="bigint">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="expiry_date" type="datetime">
+                <constraints nullable="true"/>
+            </column>
+            <column name="token" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="visit_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="visit_id"
+                                 baseTableName="confirmation_tokens"
+                                 constraintName="fk_confirmation_tokens_visit_id"
+                                 referencedColumnNames="id_visit"
+                                 referencedTableName="visit"/>
+        <rollback>
+            <dropTable tableName="confirmation_tokens"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
+
+<!--
+create table confirmation_tokens
+(
+    id_token    bigint auto_increment
+        primary key,
+    expiry_date datetime(6)  null,
+    token       varchar(255) null,
+    visit_id    bigint       not null,
+    constraint FKpxtewy5kcjb5t2waaefoih18j
+        foreign key (visit_id) references visit (id_visit)
+);
+
+-->
