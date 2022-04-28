@@ -294,10 +294,10 @@ class DoctorControllerIT {
 
     @Test
     public void shouldThrowObjectOptimisticLockingFailureExceptionWhenTryChangeEntityInTheSameTime() throws Exception {
-
+        //given
         final Doctor doctorMaria = doctorRepository.save(doctorRepository.save(new Doctor("Maria", "Sawka", new BigDecimal("1100.00"), "9999999999", true, DoctorType.CARDIOLOGIST, AnimalType.CAT, new HashSet<>())));
         assertEquals(0, doctorMaria.getVersion());
-
+        //when
         final ExecutorService executor = Executors.newFixedThreadPool(1);
         executor.execute(() -> {
             try {
@@ -315,6 +315,19 @@ class DoctorControllerIT {
         SoftAssertions sa = new SoftAssertions();
         sa.assertThat(exception).isExactlyInstanceOf(ObjectOptimisticLockingFailureException.class);
         sa.assertAll();
+        //then
+        String responseJson = mockMvc.perform(get("/doctor/" + doctorMaria.getId()))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        Doctor doctorResponse = objectMapper.readValue(responseJson, Doctor.class);
+        doctorMaria.setVisits(new HashSet<>());
+        doctorMaria.setSurname("Sawka");
+        doctorMaria.setIsActive(false);
+        assertEquals(doctorResponse, doctorMaria);
+
 
     }
 
