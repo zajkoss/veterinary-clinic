@@ -131,6 +131,10 @@ public class Doctor implements Serializable {
         this.visits = visits;
     }
 
+    public Integer getVersion() {
+        return version;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
