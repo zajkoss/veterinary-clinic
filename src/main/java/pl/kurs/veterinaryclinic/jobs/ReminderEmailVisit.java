@@ -4,17 +4,13 @@ import freemarker.template.TemplateException;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import pl.kurs.veterinaryclinic.service.EmailService;
 import pl.kurs.veterinaryclinic.service.IEmailService;
 import pl.kurs.veterinaryclinic.service.IVisitService;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Service

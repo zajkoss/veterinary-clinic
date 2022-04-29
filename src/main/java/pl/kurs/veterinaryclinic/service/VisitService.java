@@ -2,6 +2,7 @@ package pl.kurs.veterinaryclinic.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import pl.kurs.veterinaryclinic.exception.*;
 import pl.kurs.veterinaryclinic.model.ConfirmationToken;
 import pl.kurs.veterinaryclinic.model.Doctor;
@@ -13,9 +14,6 @@ import pl.kurs.veterinaryclinic.repository.DoctorRepository;
 import pl.kurs.veterinaryclinic.repository.VisitRepository;
 
 import javax.persistence.EntityNotFoundException;
-
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;

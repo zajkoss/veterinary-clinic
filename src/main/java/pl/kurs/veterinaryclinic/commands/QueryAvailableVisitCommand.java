@@ -1,7 +1,5 @@
 package pl.kurs.veterinaryclinic.commands;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.format.annotation.DateTimeFormat;
 import pl.kurs.veterinaryclinic.model.enums.AnimalType;
 import pl.kurs.veterinaryclinic.model.enums.DoctorType;
 import pl.kurs.veterinaryclinic.validators.EnumsValidator;

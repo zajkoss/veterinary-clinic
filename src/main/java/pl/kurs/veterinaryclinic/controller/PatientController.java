@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.kurs.veterinaryclinic.commands.CreatePatientCommand;
-import pl.kurs.veterinaryclinic.dto.DoctorDto;
 import pl.kurs.veterinaryclinic.dto.PatientDto;
 import pl.kurs.veterinaryclinic.model.Patient;
 import pl.kurs.veterinaryclinic.service.IPatientService;

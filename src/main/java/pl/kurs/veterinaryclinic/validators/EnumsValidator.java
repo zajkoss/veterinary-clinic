@@ -3,7 +3,6 @@ package pl.kurs.veterinaryclinic.validators;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import java.lang.annotation.*;
-import java.util.List;
 
 @Documented
 @Constraint(validatedBy = {EnumsValidatorValidator.class})

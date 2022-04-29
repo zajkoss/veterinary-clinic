@@ -4,7 +4,6 @@ import pl.kurs.veterinaryclinic.repository.DoctorRepository;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import java.time.LocalDateTime;
 
 public class UniqueNIPNumberValidator implements ConstraintValidator<UniqueNIPNumber, String> {
 

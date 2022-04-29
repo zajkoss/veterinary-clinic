@@ -1,11 +1,7 @@
 package pl.kurs.veterinaryclinic.model;
 
-import pl.kurs.veterinaryclinic.model.enums.AnimalType;
-import pl.kurs.veterinaryclinic.model.enums.DoctorType;
-
 import javax.persistence.*;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
