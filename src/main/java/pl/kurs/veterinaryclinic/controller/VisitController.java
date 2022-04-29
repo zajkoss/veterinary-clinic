@@ -67,7 +67,7 @@ public class VisitController {
         visit.setPatient(loadPatient);
         Visit createdVisit = visitService.add(visit);
 
-        applicationEventPublisher.publishEvent(new OnMakeVisitEvent(createdVisit,request.getRequestURL().toString().replace("/visit","")));
+//        applicationEventPublisher.publishEvent(new OnMakeVisitEvent(createdVisit,request.getRequestURL().toString().replace("/visit","")));
 
         return ResponseEntity.ok().body(new CreatedEntityDto(createdVisit.getId()));
     }

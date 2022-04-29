@@ -1,9 +1,7 @@
 package pl.kurs.veterinaryclinic.commands;
 
-import org.springframework.beans.factory.annotation.Value;
 import pl.kurs.veterinaryclinic.model.enums.AnimalType;
 import pl.kurs.veterinaryclinic.model.enums.DoctorType;
-import pl.kurs.veterinaryclinic.validators.DoctorPatientAvailable;
 import pl.kurs.veterinaryclinic.validators.EnumsValidator;
 import pl.kurs.veterinaryclinic.validators.UniqueNIPNumber;
 

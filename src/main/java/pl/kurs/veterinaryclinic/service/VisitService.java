@@ -1,8 +1,7 @@
 package pl.kurs.veterinaryclinic.service;
 
 import org.springframework.stereotype.Service;
-import pl.kurs.veterinaryclinic.dto.AvailableVisitDto;
-import pl.kurs.veterinaryclinic.dto.DoctorNameDto;
+import org.springframework.transaction.annotation.Propagation;
 import pl.kurs.veterinaryclinic.exception.*;
 import pl.kurs.veterinaryclinic.model.ConfirmationToken;
 import pl.kurs.veterinaryclinic.model.Doctor;
@@ -10,6 +9,7 @@ import pl.kurs.veterinaryclinic.model.Visit;
 import pl.kurs.veterinaryclinic.model.enums.AnimalType;
 import pl.kurs.veterinaryclinic.model.enums.DoctorType;
 import pl.kurs.veterinaryclinic.repository.ConfirmationTokenRepository;
+import pl.kurs.veterinaryclinic.repository.DoctorRepository;
 import pl.kurs.veterinaryclinic.repository.VisitRepository;
 
 import javax.persistence.EntityNotFoundException;
@@ -30,22 +30,35 @@ public class VisitService implements IVisitService {
 
     private VisitRepository repository;
 
+    private DoctorRepository doctorRepository;
+
     private IDoctorService doctorService;
+
 
     private ConfirmationTokenRepository confirmationTokenRepository;
 
-    public VisitService(VisitRepository repository, IDoctorService doctorService, ConfirmationTokenRepository confirmationTokenRepository) {
+    public VisitService(VisitRepository repository, DoctorRepository doctorRepository, IDoctorService doctorService, ConfirmationTokenRepository confirmationTokenRepository) {
         this.repository = repository;
+        this.doctorRepository = doctorRepository;
         this.doctorService = doctorService;
         this.confirmationTokenRepository = confirmationTokenRepository;
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Visit add(Visit visit) {
         if (visit == null)
             throw new NoEntityException();
         if (visit.getId() != null)
             throw new NoEmptyIdException(visit.getId());
+
+        doctorRepository.findByIdForUpdate(visit.getDoctor().getId());
+
+        if (repository.findByDoctorIdAndTime(visit.getDoctor().getId(), visit.getTime()).isPresent())
+            throw new VisitMemberException("Doctor already has visit that date");
+
+        if (repository.findByPatientIdAndTime(visit.getPatient().getId(), visit.getTime()).isPresent())
+            throw new VisitMemberException("Patient already has visit that date");
 
         return repository.save(visit);
     }
@@ -102,7 +115,7 @@ public class VisitService implements IVisitService {
                 result.addAll(
                         foundDoctors.stream()
                                 .filter(doctor -> plannedVisit.stream().noneMatch(visit -> visit.getTime().isEqual(finalStartTime) && visit.getDoctor() == doctor))
-                                .map(doctor -> createNewAvailableVisit(doctor,finalStartTime))
+                                .map(doctor -> createNewAvailableVisit(doctor, finalStartTime))
                                 .collect(Collectors.toList())
                 );
             }
@@ -122,7 +135,6 @@ public class VisitService implements IVisitService {
     public List<Visit> findAllVisitForNextDayWithoutSendReminder() {
         LocalDateTime fromTime = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
         LocalDateTime toTime = LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.MIN);
-        System.out.println(fromTime + " " + toTime);
         return repository.findAllByTimeAfterAndTimeBeforeAndReminderSentFalse(fromTime, toTime);
     }
 

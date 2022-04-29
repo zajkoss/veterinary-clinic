@@ -1,12 +1,10 @@
 package pl.kurs.veterinaryclinic.commands;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import pl.kurs.veterinaryclinic.validators.DoctorPatientAvailable;
 import pl.kurs.veterinaryclinic.validators.VisitTime;
 
 import java.time.LocalDateTime;
 
-@DoctorPatientAvailable
 public class CreateVisitCommand {
 
 
@@ -43,5 +41,12 @@ public class CreateVisitCommand {
         this.time = time;
     }
 
-
+    @Override
+    public String toString() {
+        return "CreateVisitCommand{" +
+                "doctorIdentity=" + doctorIdentity +
+                ", patientIdentity=" + patientIdentity +
+                ", time=" + time +
+                '}';
+    }
 }
