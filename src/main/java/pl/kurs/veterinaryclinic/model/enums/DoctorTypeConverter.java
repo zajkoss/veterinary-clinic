@@ -7,18 +7,18 @@ import javax.persistence.Converter;
 public class DoctorTypeConverter implements AttributeConverter<DoctorType, String> {
     @Override
     public String convertToDatabaseColumn(DoctorType doctorType) {
-        if(doctorType == null)
+        if (doctorType == null)
             return null;
         return doctorType.toString();
     }
 
     @Override
     public DoctorType convertToEntityAttribute(String s) {
-        if(s == null)
+        if (s == null)
             return null;
         try {
             return DoctorType.valueOf(s);
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             return null;
         }
     }

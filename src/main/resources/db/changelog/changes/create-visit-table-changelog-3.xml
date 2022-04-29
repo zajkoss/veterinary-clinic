@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <changeSet author="lukasz" id="3">
+        <createTable tableName="visit">
+            <column autoIncrement="true" name="id_visit" type="bigint">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="confirmed" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reminder_sent" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="time" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="doctor_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="patient_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="int">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="doctor_id"
+                                 baseTableName="visit"
+                                 constraintName="fk_visit_doctor_id"
+                                 referencedColumnNames="id_doctor"
+                                 referencedTableName="doctor"/>
+        <addForeignKeyConstraint baseColumnNames="patient_id"
+                                 baseTableName="visit"
+                                 constraintName="fk_visit_patient_id"
+                                 referencedColumnNames="id_patient"
+                                 referencedTableName="patient"/>
+
+        <rollback>
+            <dropTable tableName="visit"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
+

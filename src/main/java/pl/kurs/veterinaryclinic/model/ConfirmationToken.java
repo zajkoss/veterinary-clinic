@@ -23,7 +23,8 @@ public class ConfirmationToken implements Serializable {
 
     private LocalDateTime expiryDate;
 
-    public ConfirmationToken() {}
+    public ConfirmationToken() {
+    }
 
     public ConfirmationToken(String token, Visit visit) {
         this.token = token;

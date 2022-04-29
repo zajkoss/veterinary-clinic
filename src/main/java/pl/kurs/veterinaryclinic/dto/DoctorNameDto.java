@@ -1,9 +1,5 @@
 package pl.kurs.veterinaryclinic.dto;
 
-import pl.kurs.veterinaryclinic.model.enums.AnimalType;
-import pl.kurs.veterinaryclinic.model.enums.DoctorType;
-
-import java.math.BigDecimal;
 import java.util.Objects;
 
 public class DoctorNameDto {

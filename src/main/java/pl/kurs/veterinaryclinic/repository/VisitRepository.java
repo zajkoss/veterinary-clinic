@@ -9,9 +9,12 @@ import java.util.Optional;
 
 public interface VisitRepository extends JpaRepository<Visit, Long> {
 
-    List<Visit> findAllByTimeAfterAndTimeBeforeOrderByTime(LocalDateTime from,LocalDateTime to);
+    List<Visit> findAllByTimeAfterAndTimeBeforeOrderByTime(LocalDateTime from, LocalDateTime to);
+
     List<Visit> findAllByTimeAfterAndTimeBeforeAndReminderSentFalse(LocalDateTime from, LocalDateTime to);
-    Optional<Visit> findByDoctorIdAndTime(Long id,LocalDateTime time);
-    Optional<Visit> findByPatientIdAndTime(Long id,LocalDateTime time);
+
+    Optional<Visit> findByDoctorIdAndTime(Long id, LocalDateTime time);
+
+    Optional<Visit> findByPatientIdAndTime(Long id, LocalDateTime time);
 
 }

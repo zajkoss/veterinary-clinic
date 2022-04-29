@@ -17,6 +17,7 @@ import pl.kurs.veterinaryclinic.repository.PatientRepository;
 
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasItem;
@@ -49,7 +50,7 @@ class PatientControllerIT {
     @Test
     public void shouldGetSinglePatient() throws Exception {
         //given -
-        Patient patient = new Patient("Szarik", "Pies", "Owczarek", 1, "Tomasz", "Paluch", "a@a.com");
+        Patient patient = new Patient("Szarik", "Pies", "Owczarek", 1, "Tomasz", "Paluch", "a@a.com",new HashSet<>());
         patient = patientRepository.save(patient);
         //when
         String responseJson = mockMvc.perform(get("/patient/" + patient.getId()))
@@ -76,7 +77,7 @@ class PatientControllerIT {
     @Test
     public void shouldAddNewPatient() throws Exception {
         //given
-        Patient patient = new Patient("Filemon", "Kot", "Dachowiec", 5, "Dorota", "Mieszko", "b@a.com");
+        Patient patient = new Patient("Filemon", "Kot", "Dachowiec", 5, "Dorota", "Mieszko", "b@a.com",new HashSet<>());
         PatientDto patientDto = modelMapper.map(patient, PatientDto.class);
         String createPatientCommandJson = objectMapper.writeValueAsString(modelMapper.map(patient, CreatePatientCommand.class));
         //when
@@ -103,7 +104,7 @@ class PatientControllerIT {
     @Test
     public void shouldResponseBadRequestCodeWhenTryAddNewPatientWithoutName() throws Exception {
         //given
-        Patient patient = new Patient("", "Kon", "Czystej krwi arabskiej", 7, "Janina", "Dudu", "c@a.com");
+        Patient patient = new Patient("", "Kon", "Czystej krwi arabskiej", 7, "Janina", "Dudu", "c@a.com",new HashSet<>());
         String createPatientCommandJson = objectMapper.writeValueAsString(modelMapper.map(patient, CreatePatientCommand.class));
         //when
         mockMvc.perform(post("/patient")
@@ -121,7 +122,7 @@ class PatientControllerIT {
     @Test
     public void shouldResponseBadRequestCodeWhenTryAddNewPatientWithoutSpecies() throws Exception {
         //given
-        Patient patient = new Patient("Felix", "", "Czystej krwi arabskiej", 7, "Janina", "Dudu", "c@a.com");
+        Patient patient = new Patient("Felix", "", "Czystej krwi arabskiej", 7, "Janina", "Dudu", "c@a.com",new HashSet<>());
         String createPatientCommandJson = objectMapper.writeValueAsString(modelMapper.map(patient, CreatePatientCommand.class));
         //when
         mockMvc.perform(post("/patient")
@@ -139,7 +140,7 @@ class PatientControllerIT {
     @Test
     public void shouldResponseBadRequestCodeWhenTryAddNewPatientWithNegativeAge() throws Exception {
         //given
-        Patient patient = new Patient("Felix", "Kon", "Czystej krwi arabskiej", -7, "Janina", "Dudu", "c@a.com");
+        Patient patient = new Patient("Felix", "Kon", "Czystej krwi arabskiej", -7, "Janina", "Dudu", "c@a.com",new HashSet<>());
         String createPatientCommandJson = objectMapper.writeValueAsString(modelMapper.map(patient, CreatePatientCommand.class));
         //when
         mockMvc.perform(post("/patient")
@@ -157,7 +158,7 @@ class PatientControllerIT {
     @Test
     public void shouldResponseBadRequestCodeWhenTryAddNewPatientWithoutOwnerName() throws Exception {
         //given
-        Patient patient = new Patient("Felix", "Kon", "Czystej krwi arabskiej", 7, "", "Dudu", "c@a.com");
+        Patient patient = new Patient("Felix", "Kon", "Czystej krwi arabskiej", 7, "", "Dudu", "c@a.com",new HashSet<>());
         String createPatientCommandJson = objectMapper.writeValueAsString(modelMapper.map(patient, CreatePatientCommand.class));
         //when
         mockMvc.perform(post("/patient")
@@ -175,7 +176,7 @@ class PatientControllerIT {
     @Test
     public void shouldResponseBadRequestCodeWhenTryAddNewPatientWithoutOwnerSurname() throws Exception {
         //given
-        Patient patient = new Patient("Felix", "Kon", "Czystej krwi arabskiej", 7, "Janina", "", "c@a.com");
+        Patient patient = new Patient("Felix", "Kon", "Czystej krwi arabskiej", 7, "Janina", "", "c@a.com",new HashSet<>());
         String createPatientCommandJson = objectMapper.writeValueAsString(modelMapper.map(patient, CreatePatientCommand.class));
         //when
         mockMvc.perform(post("/patient")
@@ -194,7 +195,7 @@ class PatientControllerIT {
     @Test
     public void shouldResponseBadRequestCodeWhenTryAddNewPatientWithoutEmail() throws Exception {
         //given
-        Patient patient = new Patient("Felix", "Kon", "Czystej krwi arabskiej", 7, "Janina", "Dudu", "");
+        Patient patient = new Patient("Felix", "Kon", "Czystej krwi arabskiej", 7, "Janina", "Dudu", "",new HashSet<>());
         String createPatientCommandJson = objectMapper.writeValueAsString(modelMapper.map(patient, CreatePatientCommand.class));
         //when
         mockMvc.perform(post("/patient")
@@ -212,7 +213,7 @@ class PatientControllerIT {
     @Test
     public void shouldResponseBadRequestCodeWhenTryAddNewPatientWithInvalidEmailAddress() throws Exception {
         //given
-        Patient patient = new Patient("Felix", "Kon", "Czystej krwi arabskiej", 7, "Janina", "Dudu", "ca.com");
+        Patient patient = new Patient("Felix", "Kon", "Czystej krwi arabskiej", 7, "Janina", "Dudu", "ca.com",new HashSet<>());
         String createPatientCommandJson = objectMapper.writeValueAsString(modelMapper.map(patient, CreatePatientCommand.class));
         //when
         mockMvc.perform(post("/patient")
@@ -232,8 +233,8 @@ class PatientControllerIT {
     public void shouldFindTwoPatientForFirstPageOrderAscendingById() throws Exception {
         //given
         List<Patient> patients = Arrays.asList(
-                new Patient("Grizzli", "Pies", "Sznaucer", 3, "Marek", "Kowal", "a@a.com"),
-                new Patient("Lapka", "Pies", "Maltanczyk", 4, "Marek", "Kowal", "a@a.com")
+                new Patient("Grizzli", "Pies", "Sznaucer", 3, "Marek", "Kowal", "a@a.com",new HashSet<>()),
+                new Patient("Lapka", "Pies", "Maltanczyk", 4, "Marek", "Kowal", "a@a.com",new HashSet<>())
         );
         patientRepository.saveAll(patients);
 

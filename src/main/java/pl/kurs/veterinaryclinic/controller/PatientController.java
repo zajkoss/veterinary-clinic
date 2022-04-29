@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.kurs.veterinaryclinic.commands.CreatePatientCommand;
-import pl.kurs.veterinaryclinic.dto.DoctorDto;
 import pl.kurs.veterinaryclinic.dto.PatientDto;
 import pl.kurs.veterinaryclinic.model.Patient;
 import pl.kurs.veterinaryclinic.service.IPatientService;
@@ -24,8 +23,8 @@ import java.util.stream.Collectors;
 @Validated
 public class PatientController {
 
-    private IPatientService patientService;
-    private ModelMapper mapper;
+    private final IPatientService patientService;
+    private final ModelMapper mapper;
 
     public PatientController(IPatientService patientService, ModelMapper mapper) {
         this.patientService = patientService;
@@ -51,7 +50,7 @@ public class PatientController {
     public ResponseEntity<PatientDto> getPatientById(@PathVariable("id") long id) {
         return ResponseEntity.ok(
                 mapper.map(patientService.get(id).orElseThrow(
-                        () -> new EntityNotFoundException("" + id)
+                        () -> new EntityNotFoundException(Long.toString(id))
                 ), PatientDto.class)
         );
     }

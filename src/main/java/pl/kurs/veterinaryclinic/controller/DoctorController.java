@@ -1,7 +1,8 @@
 package pl.kurs.veterinaryclinic.controller;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +25,8 @@ import java.util.stream.Collectors;
 @Validated
 public class DoctorController {
 
-    private IDoctorService doctorService;
-    private ModelMapper mapper;
+    private final IDoctorService doctorService;
+    private final ModelMapper mapper;
 
     public DoctorController(DoctorService doctorService, ModelMapper mapper) {
         this.doctorService = doctorService;
@@ -52,7 +53,7 @@ public class DoctorController {
 
         return ResponseEntity.ok(
                 mapper.map(doctorService.get(id).orElseThrow(
-                        () -> new EntityNotFoundException("" + id)
+                        () -> new EntityNotFoundException(Long.toString(id))
                 ), DoctorDto.class)
         );
     }
@@ -66,7 +67,7 @@ public class DoctorController {
     @PutMapping("/fire/{id}")
     public ResponseEntity<StatusDto> softDeleteDoctor(@PathVariable("id") long id) {
         doctorService.softDelete(id);
-        return ResponseEntity.ok().body(new StatusDto("" + id));
+        return ResponseEntity.ok().body(new StatusDto(Long.toString(id)));
     }
 
 

@@ -3,20 +3,20 @@ package pl.kurs.veterinaryclinic.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.kurs.veterinaryclinic.exception.EmptyIdException;
 import pl.kurs.veterinaryclinic.exception.NoEmptyIdException;
 import pl.kurs.veterinaryclinic.exception.NoEntityException;
 import pl.kurs.veterinaryclinic.model.Patient;
 import pl.kurs.veterinaryclinic.repository.PatientRepository;
 
-import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Service
 @Transactional
 public class PatientService implements IPatientService {
 
-    private PatientRepository repository;
+    private final PatientRepository repository;
 
     public PatientService(PatientRepository repository) {
         this.repository = repository;

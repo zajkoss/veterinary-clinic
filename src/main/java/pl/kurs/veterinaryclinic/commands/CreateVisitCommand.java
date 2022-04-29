@@ -41,5 +41,12 @@ public class CreateVisitCommand {
         this.time = time;
     }
 
-
+    @Override
+    public String toString() {
+        return "CreateVisitCommand{" +
+                "doctorIdentity=" + doctorIdentity +
+                ", patientIdentity=" + patientIdentity +
+                ", time=" + time +
+                '}';
+    }
 }

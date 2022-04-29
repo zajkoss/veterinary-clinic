@@ -1,12 +1,10 @@
 package pl.kurs.veterinaryclinic.model;
 
-import pl.kurs.veterinaryclinic.model.enums.AnimalType;
-import pl.kurs.veterinaryclinic.model.enums.DoctorType;
-
 import javax.persistence.*;
 import java.io.Serializable;
-import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "patient")
@@ -39,13 +37,16 @@ public class Patient implements Serializable {
     @Column(nullable = false)
     private String email;
 
+    @OneToMany(mappedBy = "patient", fetch = FetchType.LAZY)
+    private Set<Visit> visits = new HashSet<>();
+
     @Version
     private Integer version;
 
     public Patient() {
     }
 
-    public Patient(String name, String species, String breed, Integer age, String ownerName, String ownerSurname, String email) {
+    public Patient(String name, String species, String breed, Integer age, String ownerName, String ownerSurname, String email, Set<Visit> visits) {
         this.name = name;
         this.species = species;
         this.breed = breed;
@@ -53,6 +54,7 @@ public class Patient implements Serializable {
         this.ownerName = ownerName;
         this.ownerSurname = ownerSurname;
         this.email = email;
+        this.visits = visits;
     }
 
     public Long getId() {
@@ -120,12 +122,12 @@ public class Patient implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Patient patient = (Patient) o;
-        return Objects.equals(id, patient.id) && Objects.equals(name, patient.name) && Objects.equals(species, patient.species) && Objects.equals(breed, patient.breed) && Objects.equals(age, patient.age) && Objects.equals(ownerName, patient.ownerName) && Objects.equals(ownerSurname, patient.ownerSurname) && Objects.equals(email, patient.email);
+        return Objects.equals(id, patient.id) && Objects.equals(name, patient.name) && Objects.equals(species, patient.species) && Objects.equals(breed, patient.breed) && Objects.equals(age, patient.age) && Objects.equals(ownerName, patient.ownerName) && Objects.equals(ownerSurname, patient.ownerSurname) && Objects.equals(email, patient.email) && Objects.equals(visits, patient.visits);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, species, breed, age, ownerName, ownerSurname, email);
+        return Objects.hash(id, name, species, breed, age, ownerName, ownerSurname, email, visits);
     }
 
     @Override

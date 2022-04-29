@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public class NotFoundRelationException extends RuntimeException {
 
-    private Long id;
+    private final Long id;
 
     public NotFoundRelationException(String message, Long id) {
         super(message + ", id=" + id);

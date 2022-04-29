@@ -4,7 +4,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import pl.kurs.veterinaryclinic.exception.DuplicatedValueEntityException;
+import org.springframework.transaction.annotation.Transactional;
 import pl.kurs.veterinaryclinic.exception.EmptyIdException;
 import pl.kurs.veterinaryclinic.exception.NoEmptyIdException;
 import pl.kurs.veterinaryclinic.exception.NoEntityException;
@@ -14,7 +14,6 @@ import pl.kurs.veterinaryclinic.model.enums.DoctorType;
 import pl.kurs.veterinaryclinic.repository.DoctorRepository;
 
 import javax.persistence.EntityNotFoundException;
-import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +21,7 @@ import java.util.Optional;
 @Transactional
 public class DoctorService implements IDoctorService {
 
-    private DoctorRepository repository;
+    private final DoctorRepository repository;
 
     public DoctorService(DoctorRepository repository) {
         this.repository = repository;
@@ -34,10 +33,6 @@ public class DoctorService implements IDoctorService {
             throw new NoEntityException();
         if (doctor.getId() != null)
             throw new NoEmptyIdException(doctor.getId());
-
-        if (repository.findDoctorByNipEquals(doctor.getNip()).isPresent())
-            throw new DuplicatedValueEntityException("nip", doctor.getNip());
-
         doctor.setIsActive(true);
         return repository.save(doctor);
     }
@@ -62,7 +57,7 @@ public class DoctorService implements IDoctorService {
     public void softDelete(Long id) {
         Doctor loadedDoctor = repository
                 .findById(Optional.ofNullable(id).orElseThrow(() -> new EmptyIdException(id)))
-                .orElseThrow(() -> new EntityNotFoundException("" + id));
+                .orElseThrow(() -> new EntityNotFoundException(id.toString()));
         loadedDoctor.setIsActive(false);
         repository.save(loadedDoctor);
     }

@@ -1,40 +1,56 @@
 package pl.kurs.veterinaryclinic.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import pl.kurs.veterinaryclinic.exception.*;
 import pl.kurs.veterinaryclinic.model.ConfirmationToken;
+import pl.kurs.veterinaryclinic.model.Doctor;
 import pl.kurs.veterinaryclinic.model.Visit;
+import pl.kurs.veterinaryclinic.model.enums.AnimalType;
+import pl.kurs.veterinaryclinic.model.enums.DoctorType;
 import pl.kurs.veterinaryclinic.repository.ConfirmationTokenRepository;
+import pl.kurs.veterinaryclinic.repository.DoctorRepository;
 import pl.kurs.veterinaryclinic.repository.VisitRepository;
 
 import javax.persistence.EntityNotFoundException;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class VisitService implements IVisitService {
 
-    private VisitRepository repository;
+    private final VisitRepository repository;
 
-    private ConfirmationTokenRepository confirmationTokenRepository;
+    private final DoctorRepository doctorRepository;
 
-    public VisitService(VisitRepository repository, ConfirmationTokenRepository confirmationTokenRepository) {
+    private final IDoctorService doctorService;
+
+
+    private final ConfirmationTokenRepository confirmationTokenRepository;
+
+    public VisitService(VisitRepository repository, DoctorRepository doctorRepository, IDoctorService doctorService, ConfirmationTokenRepository confirmationTokenRepository) {
         this.repository = repository;
+        this.doctorRepository = doctorRepository;
+        this.doctorService = doctorService;
         this.confirmationTokenRepository = confirmationTokenRepository;
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Visit add(Visit visit) {
         if (visit == null)
             throw new NoEntityException();
         if (visit.getId() != null)
             throw new NoEmptyIdException(visit.getId());
+
+        doctorRepository.findByIdForUpdate(visit.getDoctor().getId());
 
         if (repository.findByDoctorIdAndTime(visit.getDoctor().getId(), visit.getTime()).isPresent())
             throw new VisitMemberException("Doctor already has visit that date");
@@ -61,7 +77,7 @@ public class VisitService implements IVisitService {
     }
 
     @Override
-    public void delete(String  token) {
+    public void delete(String token) {
         ConfirmationToken confirmationToken = this.getConfirmationToken(token).orElseThrow(() -> new EntityNotFoundException("Wrong token or visit was canceled"));
         Visit visit = confirmationToken.getVisit();
 
@@ -82,11 +98,42 @@ public class VisitService implements IVisitService {
     }
 
     @Override
+    public List<Visit> findAllAvailableVisitInTimeByDoctorTypeAndAnimal(LocalDateTime fromTime, LocalDateTime toTime, DoctorType doctorType, AnimalType animalType) {
+
+        List<Visit> plannedVisit = findAllVisitInTime(fromTime, toTime);
+        List<Doctor> foundDoctors = doctorService.getAllForParameters(doctorType, animalType);
+        List<Visit> result = new ArrayList<>();
+        LocalDateTime startTime = fromTime;
+        if (startTime.getMinute() != 0 || startTime.getSecond() != 0)
+            startTime = startTime.withMinute(0).withSecond(0).plusHours(1);
+
+        while (startTime.isBefore(toTime)) {
+            LocalDateTime finalStartTime = startTime;
+            if (finalStartTime.getHour() >= 8 && finalStartTime.getHour() <= 20) {
+                result.addAll(
+                        foundDoctors.stream()
+                                .filter(doctor -> plannedVisit.stream().noneMatch(visit -> visit.getTime().isEqual(finalStartTime) && visit.getDoctor() == doctor))
+                                .map(doctor -> createNewAvailableVisit(doctor, finalStartTime))
+                                .collect(Collectors.toList())
+                );
+            }
+            startTime = startTime.plusHours(1);
+        }
+        return result;
+    }
+
+    private Visit createNewAvailableVisit(Doctor doctor, LocalDateTime hour) {
+        Visit visit = new Visit();
+        visit.setDoctor(doctor);
+        visit.setTime(hour);
+        return visit;
+    }
+
+    @Override
     public List<Visit> findAllVisitForNextDayWithoutSendReminder() {
         LocalDateTime fromTime = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
         LocalDateTime toTime = LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.MIN);
-        System.out.println(fromTime + " " + toTime);
-        return repository.findAllByTimeAfterAndTimeBeforeAndReminderSentFalse(fromTime,toTime);
+        return repository.findAllByTimeAfterAndTimeBeforeAndReminderSentFalse(fromTime, toTime);
     }
 
     @Override

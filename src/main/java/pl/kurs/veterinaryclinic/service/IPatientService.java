@@ -9,7 +9,9 @@ import java.util.Optional;
 public interface IPatientService {
 
     Patient add(Patient patient);
+
     Optional<Patient> get(Long id);
+
     Page<Patient> getAll(Pageable pageable);
 
 }

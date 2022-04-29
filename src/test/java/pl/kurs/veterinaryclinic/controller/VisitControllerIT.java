@@ -10,6 +10,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import pl.kurs.veterinaryclinic.VeterinaryClinicApplication;
 import pl.kurs.veterinaryclinic.commands.CreateVisitCommand;
 import pl.kurs.veterinaryclinic.dto.AvailableVisitDto;
@@ -24,8 +26,13 @@ import pl.kurs.veterinaryclinic.repository.VisitRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
@@ -62,6 +69,7 @@ class VisitControllerIT {
     private Doctor doctor4;
     private Patient patient1;
     private Patient patient2;
+    private Patient patient3;
     private Visit visit1;
     private Visit visit2;
     private Visit visit3;
@@ -72,12 +80,13 @@ class VisitControllerIT {
         visitRepository.deleteAll();
         doctorRepository.deleteAll();
         patientRepository.deleteAll();
-        doctor1 = doctorRepository.save(new Doctor("Tomasz", "Kubica", new BigDecimal("30.0"), "1234567893", true, DoctorType.EYE_DOCTOR, AnimalType.DOG));
-        doctor2 = doctorRepository.save(new Doctor("Katarzyna", "Lewandowska", new BigDecimal("56.0"), "1234567894", true, DoctorType.DENTIST, AnimalType.HORSE));
-        doctor3 = doctorRepository.save(new Doctor("Robert", "Kubica", new BigDecimal("30.0"), "1234767893", true, DoctorType.EYE_DOCTOR, AnimalType.HORSE));
-        doctor4 = doctorRepository.save(new Doctor("Robert", "Lewandowski", new BigDecimal("56.0"), "1239567894", true, DoctorType.DENTIST, AnimalType.DOG));
-        patient1 = patientRepository.save(new Patient("Szarik", "Pies", "Owczarek", 1, "Tomasz", "Paluch", "lukz1184@gmail.com"));
-        patient2 = patientRepository.save(new Patient("Filemon", "Kot", "Dachowiec", 5, "Dorota", "Mieszko", "lukz1184@gmail.com"));
+        doctor1 = doctorRepository.save(new Doctor("Tomasz", "Kubica", new BigDecimal("30.0"), "1234567893", true, DoctorType.EYE_DOCTOR, AnimalType.DOG, new HashSet<>()));
+        doctor2 = doctorRepository.save(new Doctor("Katarzyna", "Lewandowska", new BigDecimal("56.0"), "1234567894", true, DoctorType.DENTIST, AnimalType.HORSE, new HashSet<>()));
+        doctor3 = doctorRepository.save(new Doctor("Robert", "Kubica", new BigDecimal("30.0"), "1234767893", true, DoctorType.EYE_DOCTOR, AnimalType.HORSE, new HashSet<>()));
+        doctor4 = doctorRepository.save(new Doctor("Robert", "Lewandowski", new BigDecimal("56.0"), "1239567894", true, DoctorType.DENTIST, AnimalType.DOG, new HashSet<>()));
+        patient1 = patientRepository.save(new Patient("Szarik", "Pies", "Owczarek", 1, "Tomasz", "Paluch", "lukz1184@gmail.com", new HashSet<>()));
+        patient2 = patientRepository.save(new Patient("Filemon", "Kot", "Dachowiec", 5, "Dorota", "Mieszko", "lukz1184@gmail.com", new HashSet<>()));
+        patient3 = patientRepository.save(new Patient("Neo", "Kot", "Dachowiec", 5, "Dorota", "Mieszko", "lukz1184@gmail.com", new HashSet<>()));
         visit1 = visitRepository.save(new Visit(doctor1, patient1, LocalDateTime.of(2022, 5, 10, 10, 0)));
         visit2 = visitRepository.save(new Visit(doctor1, patient2, LocalDateTime.of(2022, 5, 10, 11, 0)));
         visit3 = visitRepository.save(new Visit(doctor2, patient1, LocalDateTime.of(2022, 5, 10, 12, 0)));
@@ -198,7 +207,7 @@ class VisitControllerIT {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorMessages").isArray())
                 .andExpect(jsonPath("$.errorMessages", hasSize(1)))
-                .andExpect(jsonPath("$.errorMessages", hasItem("Property: checkNearestVisit.type; value: 'eyedoctor'; message: Invalid value for: type")))
+                .andExpect(jsonPath("$.errorMessages", hasItem("Property: checkNearestVisit.queryAvailableVisitCommand.type; value: 'eyedoctor'; message: Invalid value for: type")))
                 .andExpect(jsonPath("$.exceptionTypeName").value("ConstraintViolationException"))
                 .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
     }
@@ -213,52 +222,8 @@ class VisitControllerIT {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorMessages").isArray())
                 .andExpect(jsonPath("$.errorMessages", hasSize(1)))
-                .andExpect(jsonPath("$.errorMessages", hasItem("Property: checkNearestVisit.animal; value: 'dogs'; message: Invalid value for: animal")))
+                .andExpect(jsonPath("$.errorMessages", hasItem("Property: checkNearestVisit.queryAvailableVisitCommand.animal; value: 'dogs'; message: Invalid value for: animal")))
                 .andExpect(jsonPath("$.exceptionTypeName").value("ConstraintViolationException"))
-                .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
-    }
-
-
-    @Test
-    public void shouldResponseBadRequestCodeWhenTryCheckVisitsWithIncorrectFromDate() throws Exception {
-        //when
-        mockMvc.perform(post("/visit/check")
-                        .param("from", "202205-10 08:00:00"))
-                //then
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errorMessages").isArray())
-                .andExpect(jsonPath("$.errorMessages", hasSize(1)))
-                .andExpect(jsonPath("$.errorMessages", hasItem("Method argument mismatch field: from")))
-                .andExpect(jsonPath("$.exceptionTypeName").value("MethodArgumentTypeMismatchException"))
-                .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
-    }
-
-    @Test
-    public void shouldResponseBadRequestCodeWhenTryCheckVisitsWithIncorrectToDate() throws Exception {
-        //when
-        mockMvc.perform(post("/visit/check")
-                        .param("to", "202205-10 08:00:00"))
-                //then
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errorMessages").isArray())
-                .andExpect(jsonPath("$.errorMessages", hasSize(1)))
-                .andExpect(jsonPath("$.errorMessages", hasItem("Method argument mismatch field: to")))
-                .andExpect(jsonPath("$.exceptionTypeName").value("MethodArgumentTypeMismatchException"))
-                .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
-    }
-
-
-    @Test
-    public void shouldResponseBadRequestCodeWhenTryAddVisitWithout() throws Exception {
-        //when
-        mockMvc.perform(post("/visit/check")
-                        .param("to", "202205-10 08:00:00"))
-                //then
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errorMessages").isArray())
-                .andExpect(jsonPath("$.errorMessages", hasSize(1)))
-                .andExpect(jsonPath("$.errorMessages", hasItem("Method argument mismatch field: to")))
-                .andExpect(jsonPath("$.exceptionTypeName").value("MethodArgumentTypeMismatchException"))
                 .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
     }
 
@@ -458,6 +423,44 @@ class VisitControllerIT {
                 .andExpect(jsonPath("$.errorCode").value("BAD_REQUEST"));
     }
 
+
+
+    @Test
+    public void shouldSaveJustOneVisitWhenTryAddTwoInTheSameTime() throws Exception{
+
+        //given
+        CreateVisitCommand visitFirst = new CreateVisitCommand();
+        visitFirst.setDoctorIdentity(doctor1.getId());
+        visitFirst.setPatientIdentity(patient1.getId());
+        visitFirst.setTime(LocalDateTime.of(2022, 5, 20, 10, 0));
+
+        CreateVisitCommand visitSecond = new CreateVisitCommand();
+        visitSecond.setDoctorIdentity(doctor1.getId());
+        visitSecond.setPatientIdentity(patient2.getId());
+        visitSecond.setTime(LocalDateTime.of(2022, 5, 20, 10, 0));
+
+        List<CreateVisitCommand> listOfVisits = List.of(visitFirst, visitSecond);
+
+        //when
+        final ExecutorService executor = Executors.newFixedThreadPool(listOfVisits.size());
+        for (CreateVisitCommand v : listOfVisits) {
+            executor.execute(() -> {
+                try {
+                    mockMvc.perform(post("/visit")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(v)));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+        executor.shutdown();
+        executor.awaitTermination(1, TimeUnit.MINUTES);
+        Thread.sleep(10000); //additional time to save event
+
+        //then
+        assertEquals(1,visitRepository.findAll().stream().filter(visit -> (visit.getDoctor().getId() == doctor1.getId() && visit.getTime().isEqual(LocalDateTime.of(2022, 5, 20, 10, 0)))).collect(Collectors.toList()).size());
+    }
 
 
 }
