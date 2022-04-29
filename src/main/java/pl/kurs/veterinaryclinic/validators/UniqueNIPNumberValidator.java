@@ -8,7 +8,7 @@ import javax.validation.ConstraintValidatorContext;
 public class UniqueNIPNumberValidator implements ConstraintValidator<UniqueNIPNumber, String> {
 
 
-    private DoctorRepository doctorRepository;
+    private final DoctorRepository doctorRepository;
 
     public UniqueNIPNumberValidator(DoctorRepository doctorRepository) {
         this.doctorRepository = doctorRepository;

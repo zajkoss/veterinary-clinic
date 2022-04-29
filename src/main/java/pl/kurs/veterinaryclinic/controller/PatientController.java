@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 @Validated
 public class PatientController {
 
-    private IPatientService patientService;
-    private ModelMapper mapper;
+    private final IPatientService patientService;
+    private final ModelMapper mapper;
 
     public PatientController(IPatientService patientService, ModelMapper mapper) {
         this.patientService = patientService;

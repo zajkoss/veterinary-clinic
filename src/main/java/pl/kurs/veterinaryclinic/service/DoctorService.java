@@ -21,7 +21,7 @@ import java.util.Optional;
 @Transactional
 public class DoctorService implements IDoctorService {
 
-    private DoctorRepository repository;
+    private final DoctorRepository repository;
 
     public DoctorService(DoctorRepository repository) {
         this.repository = repository;

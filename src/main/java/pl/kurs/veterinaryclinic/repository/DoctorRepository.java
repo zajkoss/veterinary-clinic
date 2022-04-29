@@ -13,6 +13,7 @@ import java.util.Optional;
 public interface DoctorRepository extends JpaRepository<Doctor, Long> {
 
     Optional<Doctor> findDoctorByIdAndIsActiveTrue(Long id);
+
     boolean existsByNip(String nipNumber);
 
     @Transactional

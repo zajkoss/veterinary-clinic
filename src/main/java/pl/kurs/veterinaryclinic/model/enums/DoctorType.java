@@ -8,4 +8,4 @@ public enum DoctorType {
     EYE_DOCTOR,
     DENTIST,
     NEUROLOGIST,
-    }
+}

@@ -33,11 +33,11 @@ import java.util.stream.Collectors;
 @Validated
 public class VisitController {
 
-    private IVisitService visitService;
-    private IPatientService patientService;
-    private IDoctorService doctorService;
-    private ModelMapper mapper;
-    private ApplicationEventPublisher applicationEventPublisher;
+    private final IVisitService visitService;
+    private final IPatientService patientService;
+    private final IDoctorService doctorService;
+    private final ModelMapper mapper;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public VisitController(IVisitService visitService, IPatientService patientService, IDoctorService doctorService, ModelMapper mapper, ApplicationEventPublisher applicationEventPublisher) {
         this.visitService = visitService;
@@ -50,13 +50,13 @@ public class VisitController {
     @PostMapping
     public ResponseEntity<CreatedEntityDto> addVisit(
             @RequestBody @Valid CreateVisitCommand createVisitCommand,
-                HttpServletRequest request
+            HttpServletRequest request
     ) {
         Doctor loadDoctor = doctorService.getActiveById(createVisitCommand.getDoctorIdentity()).orElseThrow(
-                () -> new NotFoundRelationException("Doctor for provided id not found",createVisitCommand.getDoctorIdentity())
+                () -> new NotFoundRelationException("Doctor for provided id not found", createVisitCommand.getDoctorIdentity())
         );
         Patient loadPatient = patientService.get(createVisitCommand.getPatientIdentity()).orElseThrow(
-                () -> new NotFoundRelationException("Patient for provided id not found",createVisitCommand.getPatientIdentity())
+                () -> new NotFoundRelationException("Patient for provided id not found", createVisitCommand.getPatientIdentity())
         );
 
         Visit visit = mapper.map(createVisitCommand, Visit.class);
@@ -82,7 +82,6 @@ public class VisitController {
     }
 
 
-
     @PostMapping("/check")
     public ResponseEntity<List<AvailableVisitDto>> checkNearestVisit(
             @ModelAttribute @Valid QueryAvailableVisitCommand queryAvailableVisitCommand, BindingResult bindingResult
@@ -90,12 +89,12 @@ public class VisitController {
         DoctorType doctorType = queryAvailableVisitCommand.getType() == null ? null : DoctorType.valueOf(queryAvailableVisitCommand.getType().toUpperCase());
         AnimalType animalType = queryAvailableVisitCommand.getAnimal() == null ? null : AnimalType.valueOf(queryAvailableVisitCommand.getAnimal().toUpperCase());
 
-        if(queryAvailableVisitCommand.getFrom() == null)
+        if (queryAvailableVisitCommand.getFrom() == null)
             queryAvailableVisitCommand.setFrom(LocalDateTime.now());
-        if(queryAvailableVisitCommand.getTo() == null)
+        if (queryAvailableVisitCommand.getTo() == null)
             queryAvailableVisitCommand.setTo(queryAvailableVisitCommand.getFrom().plusDays(2));
 
-        List<AvailableVisitDto> availableVisit = visitService.findAllAvailableVisitInTimeByDoctorTypeAndAnimal(queryAvailableVisitCommand.getFrom(),queryAvailableVisitCommand.getTo(),doctorType,animalType)
+        List<AvailableVisitDto> availableVisit = visitService.findAllAvailableVisitInTimeByDoctorTypeAndAnimal(queryAvailableVisitCommand.getFrom(), queryAvailableVisitCommand.getTo(), doctorType, animalType)
                 .stream()
                 .map(this::mapVisitToAvailableVisitDto)
                 .collect(Collectors.toList());

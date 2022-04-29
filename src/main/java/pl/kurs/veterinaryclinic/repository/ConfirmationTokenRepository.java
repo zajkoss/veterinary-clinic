@@ -9,7 +9,9 @@ import java.util.Optional;
 public interface ConfirmationTokenRepository extends JpaRepository<ConfirmationToken, Long> {
 
     Optional<ConfirmationToken> findByToken(String token);
+
     Optional<ConfirmationToken> findByVisit(Visit visit);
+
     void deleteAllByVisitId(Long id);
 
 }

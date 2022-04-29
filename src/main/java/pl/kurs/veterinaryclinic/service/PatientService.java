@@ -16,7 +16,7 @@ import java.util.Optional;
 @Transactional
 public class PatientService implements IPatientService {
 
-    private PatientRepository repository;
+    private final PatientRepository repository;
 
     public PatientService(PatientRepository repository) {
         this.repository = repository;

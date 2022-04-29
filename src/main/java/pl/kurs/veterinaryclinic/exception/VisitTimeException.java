@@ -10,7 +10,7 @@ public class VisitTimeException extends RuntimeException {
 
     private Long token;
     private LocalDateTime executeTime;
-    private LocalDateTime visitTime;
+    private final LocalDateTime visitTime;
 
     public VisitTimeException(String message, Long token, LocalDateTime executeTime, LocalDateTime visitTime) {
         super(message +

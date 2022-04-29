@@ -18,11 +18,11 @@ public class ReminderEmailVisit {
 
     private static final String emailSubject = "Reminder visit";
     private static final String emailMessage = "We kindly inform you about your appointment tomorrow at: ";
-    private Logger logger = LoggerFactory.getLogger(ReminderEmailVisit.class);
+    private final Logger logger = LoggerFactory.getLogger(ReminderEmailVisit.class);
 
-    private IVisitService visitService;
+    private final IVisitService visitService;
 
-    private IEmailService emailService;
+    private final IEmailService emailService;
 
     public ReminderEmailVisit(IVisitService visitService, IEmailService emailService) {
         this.visitService = visitService;

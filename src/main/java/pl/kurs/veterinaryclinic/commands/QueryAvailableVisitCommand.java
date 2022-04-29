@@ -8,10 +8,10 @@ import java.time.LocalDateTime;
 
 public class QueryAvailableVisitCommand {
 
-    @EnumsValidator(enumClass = DoctorType.class,message = "Invalid value for: type")
+    @EnumsValidator(enumClass = DoctorType.class, message = "Invalid value for: type")
     String type;
 
-    @EnumsValidator(enumClass = AnimalType.class,message = "Invalid value for: animal")
+    @EnumsValidator(enumClass = AnimalType.class, message = "Invalid value for: animal")
     String animal;
 
     LocalDateTime from;

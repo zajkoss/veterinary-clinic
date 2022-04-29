@@ -12,10 +12,15 @@ import java.util.Optional;
 public interface IDoctorService {
 
     Doctor add(Doctor doctor);
+
     Optional<Doctor> get(Long id);
+
     Optional<Doctor> getActiveById(Long id);
+
     Page<Doctor> getAll(Pageable pageable);
+
     void softDelete(Long id);
+
     List<Doctor> getAllForParameters(DoctorType doctorType, AnimalType animalType);
 
 }

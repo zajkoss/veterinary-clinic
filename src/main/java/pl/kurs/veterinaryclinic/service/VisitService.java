@@ -26,14 +26,14 @@ import java.util.stream.Collectors;
 @Transactional
 public class VisitService implements IVisitService {
 
-    private VisitRepository repository;
+    private final VisitRepository repository;
 
-    private DoctorRepository doctorRepository;
+    private final DoctorRepository doctorRepository;
 
-    private IDoctorService doctorService;
+    private final IDoctorService doctorService;
 
 
-    private ConfirmationTokenRepository confirmationTokenRepository;
+    private final ConfirmationTokenRepository confirmationTokenRepository;
 
     public VisitService(VisitRepository repository, DoctorRepository doctorRepository, IDoctorService doctorService, ConfirmationTokenRepository confirmationTokenRepository) {
         this.repository = repository;

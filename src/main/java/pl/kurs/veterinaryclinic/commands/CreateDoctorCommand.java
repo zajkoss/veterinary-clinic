@@ -22,14 +22,14 @@ public class CreateDoctorCommand {
     @Positive
     private BigDecimal salary;
 
-    @Pattern(regexp = "\\d{10}",message = "{nip.message}")
+    @Pattern(regexp = "\\d{10}", message = "{nip.message}")
     @UniqueNIPNumber
     private String nip;
 
-    @EnumsValidator(enumClass = DoctorType.class,message = "Invalid value for: type field")
+    @EnumsValidator(enumClass = DoctorType.class, message = "Invalid value for: type field")
     private String type;
 
-    @EnumsValidator(enumClass = AnimalType.class,message = "Invalid value for: animalType field")
+    @EnumsValidator(enumClass = AnimalType.class, message = "Invalid value for: animalType field")
     private String animalType;
 
     public String getName() {
@@ -48,11 +48,11 @@ public class CreateDoctorCommand {
         return nip;
     }
 
-    public String  getType() {
+    public String getType() {
         return type;
     }
 
-    public String  getAnimalType() {
+    public String getAnimalType() {
         return animalType;
     }
 

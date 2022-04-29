@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
 @Validated
 public class DoctorController {
 
-    private IDoctorService doctorService;
-    private ModelMapper mapper;
+    private final IDoctorService doctorService;
+    private final ModelMapper mapper;
 
     public DoctorController(DoctorService doctorService, ModelMapper mapper) {
         this.doctorService = doctorService;

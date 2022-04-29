@@ -20,10 +20,10 @@ import java.util.Map;
 
 @Service
 @Transactional
-public class EmailService implements IEmailService{
+public class EmailService implements IEmailService {
 
-    private JavaMailSender emailSender;
-    private Configuration configuration;
+    private final JavaMailSender emailSender;
+    private final Configuration configuration;
 
 
     public EmailService(JavaMailSender emailSender, Configuration configuration) {
@@ -39,7 +39,7 @@ public class EmailService implements IEmailService{
         mimeMessageHelper.setFrom(Passes.emailUserName);
         mimeMessageHelper.setTo(address);
         mimeMessageHelper.setSubject(subject);
-        mimeMessageHelper.setText(htmlContent,true);
+        mimeMessageHelper.setText(htmlContent, true);
         emailSender.send(message);
     }
 

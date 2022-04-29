@@ -11,6 +11,8 @@ import java.lang.annotation.*;
 public @interface UniqueNIPNumber {
 
     String message() default "{nipunique.message}";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

@@ -7,18 +7,18 @@ import javax.persistence.Converter;
 public class AnimalTypeConverter implements AttributeConverter<AnimalType, String> {
     @Override
     public String convertToDatabaseColumn(AnimalType animalType) {
-        if(animalType == null)
+        if (animalType == null)
             return null;
         return animalType.toString();
     }
 
     @Override
     public AnimalType convertToEntityAttribute(String s) {
-        if(s == null)
+        if (s == null)
             return null;
         try {
             return AnimalType.valueOf(s);
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             return null;
         }
     }

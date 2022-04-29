@@ -11,7 +11,10 @@ import java.lang.annotation.*;
 public @interface EnumsValidator {
 
     Class<? extends Enum<?>> enumClass();
+
     String message() default "Invalid value for: {enumClass}";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

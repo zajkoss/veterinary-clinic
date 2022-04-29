@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class EnumsValidatorValidator implements ConstraintValidator<EnumsValidator, CharSequence> {
-    private List<String> availableValues ;
+    private List<String> availableValues;
 
     @Override
     public void initialize(EnumsValidator constraintAnnotation) {

@@ -21,11 +21,11 @@ public class MakeVisitListener implements ApplicationListener<OnMakeVisitEvent> 
     private static final String confirmationUrlAddress = "/visit/confirm/";
     private static final String cancelUrlAddress = "/visit/cancel/";
 
-    private IVisitService visitService;
+    private final IVisitService visitService;
 
-    private EmailService emailService;
+    private final EmailService emailService;
 
-    private Logger logger = LoggerFactory.getLogger(EmailService.class);
+    private final Logger logger = LoggerFactory.getLogger(EmailService.class);
 
     public MakeVisitListener(IVisitService visitService, EmailService emailService) {
         this.visitService = visitService;

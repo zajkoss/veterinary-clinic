@@ -11,6 +11,8 @@ import java.lang.annotation.*;
 public @interface VisitTime {
 
     String message() default "{visittime.message}";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

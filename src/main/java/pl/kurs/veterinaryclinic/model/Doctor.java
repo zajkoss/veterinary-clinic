@@ -29,7 +29,7 @@ public class Doctor implements Serializable {
     @Column(nullable = false)
     private BigDecimal salary;
 
-    @Column(nullable = false,length = 10,unique = true)
+    @Column(nullable = false, length = 10, unique = true)
     private String nip;
 
     @Column(nullable = false)
@@ -45,7 +45,8 @@ public class Doctor implements Serializable {
     @Version
     private Integer version;
 
-    public Doctor() {}
+    public Doctor() {
+    }
 
     public Doctor(String name, String surname, BigDecimal salary, String nip, Boolean isActive, DoctorType type, AnimalType animalType, Set<Visit> visits) {
         this.name = name;
