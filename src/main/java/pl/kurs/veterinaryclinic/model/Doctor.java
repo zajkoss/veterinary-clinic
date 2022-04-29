@@ -39,7 +39,7 @@ public class Doctor implements Serializable {
 
     private AnimalType animalType;
 
-    @OneToMany(mappedBy = "doctor", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "doctor")
     private Set<Visit> visits = new HashSet<>();
 
     @Version
@@ -159,7 +159,6 @@ public class Doctor implements Serializable {
                 ", isActive=" + isActive +
                 ", type=" + type +
                 ", animalType=" + animalType +
-                ", visits=" + visits +
                 '}';
     }
 }

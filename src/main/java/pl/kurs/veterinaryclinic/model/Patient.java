@@ -145,7 +145,6 @@ public class Patient implements Serializable {
                 ", ownerName='" + ownerName + '\'' +
                 ", ownerSurname='" + ownerSurname + '\'' +
                 ", email='" + email + '\'' +
-                ", visits=" + visits +
                 '}';
     }
 }
